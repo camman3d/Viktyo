@@ -1,4 +1,18 @@
-This is your new Play 2.1 application
+VIKTYO
 =====================================
 
-This file will be packaged with your application, when using `play dist`.
+**Getting Started**
+
+* Setting up the Database *
+1. Create a MySQL database named viktyo.
+2. Create a DB user
+    - Recommended Username: viktyo_user
+3. Edit conf/application.conf
+    - Update to match your configuration
+
+* Setting up the Application *
+1. Download Play 2.1 at http://www.playframework.org/
+2. From a command line, in the project directory, run:
+  "play run"
+3. Open a browser to http://localhost:9000
+4. Click the "Apply Evolutions" button
