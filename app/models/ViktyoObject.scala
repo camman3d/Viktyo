@@ -28,6 +28,8 @@ case class ViktyoObject(
 object ViktyoObject {
   val typeMap = Map[Symbol, Int](
     'user -> 1,
-    'posting -> 2
+    'posting -> 2,
+    'image -> 3,
+    'text -> 4
   )
 }
