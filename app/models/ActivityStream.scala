@@ -66,6 +66,12 @@ case class ActivityStream(
       }
     }
   }
+
+  def delete() {
+    DB.withConnection { implicit connection =>
+      SQL("delete from activity_stream where id = {id}").on('id -> this.id.get).executeUpdate()
+    }
+  }
 }
 
 object ActivityStream {
@@ -102,7 +108,8 @@ object ActivityStream {
     }
   }
 
-  def listByTarget(id: Long, page: (Int, Int) = (20, 0)): List[ActivityStream] = {
+  def listByTarget(id: Long, page: Int = 0, pageSize: Int = 10): List[ActivityStream] = {
+    val offset = page * pageSize
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -112,8 +119,8 @@ object ActivityStream {
         """
       ).on(
         'id -> id,
-        'pageSize -> page._1,
-        'offset -> page._2
+        'pageSize -> pageSize,
+        'offset -> offset
       ).as(ActivityStream.simple *)
     }
   }

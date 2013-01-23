@@ -70,6 +70,14 @@ case class Posting(
     }
   }
 
+  def delete() {
+    DB.withConnection { implicit connection =>
+      this.properties.map(p => p.delete())
+      SQL("delete from posting where id = {id}").on('id -> this.id.get).executeUpdate()
+      SQL("delete from viktyo_object where id = {id}").on('id -> this.objId)
+    }
+  }
+
   def getProperty(attribute: String): Option[String] = {
     val property = this.properties.find(p => p.attribute == attribute)
     if (property.isDefined)
@@ -119,6 +127,40 @@ object Posting {
         'postingType -> ViktyoObject.typeMap('posting),
         'id -> id
       ).as(Posting.simple.singleOpt)
+    }
+  }
+
+  def list(page: Int = 0, pageSize: Int = 10): List[Posting] = {
+    val offset = page * pageSize
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          SELECT object.id, posting.*
+          FROM object
+          JOIN posting ON ( posting.id = object.objId )
+          WHERE object.objType = {postingType}
+          limit {pageSize} offset {offset}
+        """
+      ).on(
+        'postingType -> ViktyoObject.typeMap('posting),
+        'pageSize -> pageSize,
+        'offset -> offset
+      ).as(Posting.simple *)
+    }
+  }
+
+  def listAll: List[Posting] = {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          SELECT object.id, posting.*
+          FROM object
+          JOIN posting ON ( posting.id = object.objId )
+          WHERE object.objType = {postingType}
+        """
+      ).on(
+        'postingType -> ViktyoObject.typeMap('posting)
+      ).as(Posting.simple *)
     }
   }
 

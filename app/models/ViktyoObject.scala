@@ -30,6 +30,7 @@ object ViktyoObject {
     'user -> 1,
     'posting -> 2,
     'image -> 3,
-    'text -> 4
+    'text -> 4,
+    'network -> 5
   )
 }

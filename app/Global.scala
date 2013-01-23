@@ -1,6 +1,6 @@
 import play.api._
 
-class Global extends GlobalSettings {
+object Global extends GlobalSettings {
   override def onStart(app: Application) {
     createFixtures()
   }

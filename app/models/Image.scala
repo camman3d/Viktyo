@@ -58,6 +58,14 @@ case class Image(
     }
   }
 
+  def delete() {
+    DB.withConnection { implicit connection =>
+      this.properties.map(p => p.delete())
+      SQL("delete from image where id = {id}").on('id -> this.id.get).executeUpdate()
+      SQL("delete from viktyo_object where id = {id}").on('id -> this.objId)
+    }
+  }
+
   def getProperty(attribute: String): Option[String] = {
     val property = this.properties.find(p => p.attribute == attribute)
     if (property.isDefined)

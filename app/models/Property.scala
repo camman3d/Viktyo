@@ -39,6 +39,12 @@ case class Property(id: Pk[Long], attribute: String, value: String, objId: Long)
       }
     }
   }
+
+  def delete() {
+    DB.withConnection { implicit connection =>
+      SQL("delete from property where id = {id}").on('id -> this.id.get).executeUpdate()
+    }
+  }
 }
 
 object Property {

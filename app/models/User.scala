@@ -60,6 +60,14 @@ case class User(
     }
   }
 
+  def delete() {
+    DB.withConnection { implicit connection =>
+      this.properties.map(p => p.delete())
+      SQL("delete from user where id = {id}").on('id -> this.id.get).executeUpdate()
+      SQL("delete from viktyo_object where id = {id}").on('id -> this.objId)
+    }
+  }
+
   def getProperty(attribute: String): Option[String] = {
     val property = this.properties.find(p => p.attribute == attribute)
     if (property.isDefined)
@@ -108,6 +116,30 @@ object User {
         'userType -> ViktyoObject.typeMap('user),
         'id -> id
       ).as(User.simple.singleOpt)
+    }
+  }
+
+  def listByAccountType(accountType: String, page: Int = 0, pageSize: Int = 10): List[User] = {
+    val offset = page * pageSize
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          SELECT object.id, user.*
+          FROM object
+          JOIN user ON ( user.id = object.objId )
+          JOIN property ON ( object.id = property.objId)
+          WHERE object.objType = {userType}
+          AND property.attribute = {accountTypeAttribute}
+          AND property.value = {accountType}
+          limit {pageSize} offset {offset}
+        """
+      ).on(
+        'userType -> ViktyoObject.typeMap('user),
+        'accountTypeAttribute -> "accountType",
+        'accountType -> accountType,
+        'pageSize -> pageSize,
+        'offset -> offset
+      ).as(User.simple *)
     }
   }
 }
