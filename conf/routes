@@ -3,7 +3,27 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
+GET     /                               controllers.Application.index
+
+# Authentication
+POST    /auth/login                     controllers.Account.login
+GET     /auth/logout                    controllers.Account.logout
+GET     /auth/signup                    controllers.Account.signup
+GET     /auth/signup/user               controllers.Account.signupUser
+GET     /auth/signup/organization       controllers.Account.signupOrganization
+POST    /auth/signup/user               controllers.Account.createUserAccount
+POST    /auth/signup/organization       controllers.Account.createOrganizationAccount
+POST    /auth/forgotPassword            controllers.Account.forgotPassword
+GET     /auth/passwordReset/:code       controllers.Account.passwordResetPage(code: String)
+POST    /auth/passwordReset/:code       controllers.Account.passwordReset(code: String)
+
+# Profile
+GET     /account                        controllers.Account.profile
+POST    /account/changePassword         controllers.Account.changePassword
+POST    /account/setProperty            controllers.Account.setProperty
+POST    /account/removeProperty         controllers.Account.removeProperty
+
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
