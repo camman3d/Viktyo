@@ -6,6 +6,7 @@ import anorm._
 import anorm.SqlParser._
 import anorm.~
 import anorm.Id
+import java.util.Date
 
 /**
  * Based off the specification found here:
@@ -124,5 +125,26 @@ object ActivityStream {
       ).as(ActivityStream.simple *)
     }
   }
+
+  def createComment(user: User, comment: String, target: Long): ActivityStream = {
+    val text = Text(NotAssigned, comment).save
+    ActivityStream(NotAssigned, new Date().getTime, user, "comment", text.objId, target)
+  }
+
+  def createImagePost(user: User, image: Image, target: Long): ActivityStream = {
+    ActivityStream(NotAssigned, new Date().getTime, user, "imagePost", image.objId, target)
+  }
+
+  /**
+    * For a status update the target is the user and the object is the update as text.
+   * @param user The user making the update
+   * @param update The update
+   * @return
+   */
+  def createStatusUpdate(user: User, update: String, target: Long): ActivityStream = {
+    val text = Text(NotAssigned, update).save
+    ActivityStream(NotAssigned, new Date().getTime, user, "statusUpdate", text.objId, target)
+  }
+
 
 }

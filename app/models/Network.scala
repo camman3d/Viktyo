@@ -114,4 +114,24 @@ object Network {
       ).as(Network.simple.singleOpt)
     }
   }
+
+  def list(page: Int = 0, pageSize: Int = 10): List[Network] = {
+    val offset = page * pageSize
+    DB.withConnection {
+      implicit connection =>
+        SQL(
+          """
+          SELECT object.id, network.*
+          FROM object
+          JOIN network ON ( network.id = object.objId )
+          WHERE object.objType = {networkType}
+          limit {pageSize} offset {offset}
+          """
+        ).on(
+          'networkType -> ViktyoObject.typeMap('network),
+          'pageSize -> pageSize,
+          'offset -> offset
+        ).as(Network.simple *)
+    }
+  }
 }

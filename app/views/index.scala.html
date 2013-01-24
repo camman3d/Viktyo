@@ -1,7 +1,11 @@
-@(message: String)
+@()(implicit request: RequestHeader)
 
 @main("Welcome to Play 2.1") {
     
-    @play20.welcome(message)
+    <form action="@routes.Account.login()" method="@routes.Account.login().method">
+        Username: <input type="text" name="username"><br>
+        Password: <input type="password" name="password"><br>
+        <input type="submit">
+    </form>
     
 }

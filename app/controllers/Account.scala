@@ -63,7 +63,7 @@ object Account extends Controller {
       // Check that the username/password pair is correct
       val user = User.authenticate(username, password)
       if (user.isDefined) {
-        Ok // TODO: Redirect with message and session
+        Redirect(routes.Home.feed()).withSession("username" -> username)
 
       } else // Bad credentials
         Ok // TODO: Redirect with message

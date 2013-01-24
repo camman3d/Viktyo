@@ -102,6 +102,37 @@ case class User(
   def setPassword(password: String): User = {
     User(this.id, this.fullname, this.username, password, this.properties, this.objId)
   }
+
+  // Network functions
+
+  def getNetworks: List[Network] = {
+    if (this.getProperty("networks").isDefined)
+      this.getProperty("networks").get.split(",").map(n => Network.findById(n.toLong).get).toList
+    else
+      List()
+  }
+
+  def addNetwork(network: Network): User = {
+    if (this.getProperty("networks").isDefined)
+      this.setProperty("networks", this.getProperty("networks").get + "," + network.id.get)
+    else
+      this.setProperty("networks", network.id.get.toString)
+  }
+
+  def removeNetwork(network: Network): User = {
+    if (this.getProperty("networks").isDefined)
+      this.setProperty("networks",
+        this.getProperty("networks").get.split(",").filterNot(n => n == network.id.get.toString).mkString(","))
+    else
+      this
+  }
+
+  def hasNetwork(network: Network): Boolean = {
+    if (this.getProperty("networks").isDefined)
+      this.getProperty("networks").get.split(",").map(n => n.toLong).filter(l => l == network.id.get).size > 0
+    else
+      false
+  }
 }
 
 object User {
@@ -173,8 +204,7 @@ object User {
     }
   }
 
-  def listByProperty(attribute: String, value: String, page: Int = 0, pageSize: Int = 10): List[User] = {
-    val offset = page * pageSize
+  def listByProperty(attribute: String, value: String): List[User] = {
     DB.withConnection {
       implicit connection =>
         SQL(
@@ -186,20 +216,17 @@ object User {
           WHERE object.objType = {userType}
           AND property.attribute = {attribute}
           AND property.value = {value}
-            |limit {pageSize} offset {offset}
           """
         ).on(
           'userType -> ViktyoObject.typeMap('user),
           'attribute -> attribute,
-          'value -> value,
-          'pageSize -> pageSize,
-          'offset -> offset
+          'value -> value
         ).as(User.simple *)
     }
   }
 
-  def listByAccountType(accountType: String, page: Int = 0, pageSize: Int = 10): List[User] =
-    listByProperty("accountType", accountType, page, pageSize)
+  def listByAccountType(accountType: String): List[User] =
+    listByProperty("accountType", accountType)
 
   def authenticate(username: String, password: String): Option[User] = {
     DB.withConnection {

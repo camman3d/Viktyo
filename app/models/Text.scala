@@ -50,7 +50,7 @@ case class Text(
         val newProperties = this.properties.map(p => Property(p.id, p.attribute, p.value, obj.id.get).save)
 
         // Return the text
-        Text(Id(id.get), this.textValue, newProperties, this.objId)
+        Text(Id(id.get), this.textValue, newProperties, obj.id.get)
       }
     }
   }

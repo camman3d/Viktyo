@@ -13,7 +13,9 @@ object ApplicationBuild extends Build {
     anorm,
     "mysql" % "mysql-connector-java" % "5.1.18",
     "org.apache.commons" % "commons-lang3" % "3.0",
-    "org.codemonkey.simplejavamail" % "simple-java-mail" % "2.1"
+    "org.apache.commons" % "commons-io" % "1.3.2",
+    "org.codemonkey.simplejavamail" % "simple-java-mail" % "2.1",
+    "com.amazonaws" % "aws-java-sdk" % "1.0.002"
   )
 
 

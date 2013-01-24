@@ -23,7 +23,27 @@ POST    /account/changePassword         controllers.Account.changePassword
 POST    /account/setProperty            controllers.Account.setProperty
 POST    /account/removeProperty         controllers.Account.removeProperty
 
+# Home
+GET     /home                           controllers.Home.feed
+POST    /home/add/statusUpdate          controllers.Home.addStatusUpdate
+POST    /home/add/image                 controllers.Home.addImage
 
+# Networks
+GET     /network                        controllers.Networks.browse
+GET     /network/:id                    controllers.Networks.networkFeed(id: Long)
+POST    /network/:id/join               controllers.Networks.joinNetwork(id: Long)
+POST    /network/:id/add/statusUpdate   controllers.Networks.addStatusUpdate(id: Long)
+POST    /network/:id/add/image          controllers.Networks.addImage(id: Long)
+
+# Organizations
+GET     /organization                   controllers.Organizations.browseList
+GET     /organization/map               controllers.Organizations.browseMap
+GET     /organization/:id               controllers.Organizations.view(id: Long)
+
+# Postings
+GET     /posting                        controllers.Postings.browseList
+GET     /posting/map                    controllers.Postings.browseMap
+GET     /posting/:id                    controllers.Postings.view(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
