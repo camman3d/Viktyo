@@ -44,6 +44,14 @@ GET     /organization/:id               controllers.Organizations.view(id: Long)
 GET     /posting                        controllers.Postings.browseList
 GET     /posting/map                    controllers.Postings.browseMap
 GET     /posting/:id                    controllers.Postings.view(id: Long)
+POST    /posting/:id/add/comment        controllers.Postings.addComment(id: Long)
+POST    /posting/:id/add/image          controllers.Postings.addImage(id: Long)
+GET     /posting/:postId/remove/:id     controllers.Postings.deleteActivityStream(postId: Long, id: Long)
+GET     /posting/:id/favorite           controllers.Postings.favorite(id: Long)
+GET     /posting/:id/unfavorite         controllers.Postings.unfavorite(id: Long)
+
+# Users
+GET     /users/:id                      controllers.Users.view(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

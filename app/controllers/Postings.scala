@@ -82,6 +82,79 @@ object Postings extends Controller {
   def browseList = browse('list)
   def browseMap = browse('map)
 
+  def deleteActivityStream(postId: Long, id: Long) = Action(parse.urlFormEncoded) {
+    implicit request =>
+
+      // Check that the user is logged in
+      val user = Account.getCurrentUser
+      if (user.isDefined) {
+
+        // Check that the posting is real
+        val posting = Posting.findById(postId)
+        if (posting.isDefined) {
+
+          // Check that the comment is real and the user made the comment
+          val comment = ActivityStream.findById(id)
+          if(comment.isDefined && comment.get.actor == user.get) {
+            comment.get.delete()
+            Ok // TODO: Redirect with message
+
+          } else // Can't delete
+            Ok // TODO: Redirect with message
+        } else // Network doesn't exist
+          Ok // TODO: Redirect with message
+      } else // User not logged in
+        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+  }
+
+  def favorite(id: Long) = Action(parse.multipartFormData) {
+    implicit request =>
+
+      // Check that the user is logged in
+      val user = Account.getCurrentUser
+      if (user.isDefined) {
+
+        // Check that the posting is real
+        val posting = Posting.findById(id)
+        if (posting.isDefined) {
+
+          // Favorite it
+          user.get.addFavorite(posting.get).save
+
+          // Create the update
+          ActivityStream.createFavorite(user.get, posting.get).save
+          Ok // TODO: Redirect with message
+
+        } else // Network doesn't exist
+          Ok // TODO: Redirect with message
+      } else // User not logged in
+        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+  }
+
+  def unfavorite(id: Long) = Action(parse.multipartFormData) {
+    implicit request =>
+
+      // Check that the user is logged in
+      val user = Account.getCurrentUser
+      if (user.isDefined) {
+
+        // Check that the posting is real
+        val posting = Posting.findById(id)
+        if (posting.isDefined) {
+
+          // Unfavorite it
+          user.get.removeFavorite(posting.get).save
+
+          // Delete from activity stream
+          ActivityStream.find(user.get, "favorite", posting.get.objId, posting.get.objId).get.delete()
+          Ok // TODO: Redirect with message
+
+        } else // Network doesn't exist
+          Ok // TODO: Redirect with message
+      } else // User not logged in
+        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+  }
+
   def view(id: Long) = Action { implicit request =>
 
   // Check that the user is logged in

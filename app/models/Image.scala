@@ -5,6 +5,7 @@ import play.api.db.DB
 import play.api.Play.current
 import anorm.SqlParser._
 import anorm.~
+import tools.ImageUploader
 
 case class Image(
   id: Pk[Long],
@@ -60,6 +61,7 @@ case class Image(
 
   def delete() {
     DB.withConnection { implicit connection =>
+      // TODO: Delete the file
       this.properties.map(p => p.delete())
       SQL("delete from image where id = {id}").on('id -> this.id.get).executeUpdate()
       SQL("delete from viktyo_object where id = {id}").on('id -> this.objId)

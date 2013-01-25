@@ -1,0 +1,99 @@
+package models
+
+import anorm._
+import play.api.db.DB
+import play.api.Play.current
+import anorm.SqlParser._
+import anorm.~
+import org.apache.commons.lang3.StringEscapeUtils
+import play.api.libs.json.Json
+
+case class ViktyoNotification(
+                               id: Pk[Long],
+                               user: Long,
+                               from: Long,
+                               notificationType: Symbol,
+                               data: Map[String, String],
+                               created: Long,
+                               read: Boolean
+                               ) {
+
+
+  def save: ViktyoNotification = {
+    DB.withConnection {
+      implicit connection =>
+        if (this.id.isDefined) {
+          // Save the notification
+          SQL(
+            """
+            update notification
+            set `user` = {user}, `from` = {from}, notificationType = {notificationType}, `data` = {data}, created = {created},
+            `read` = {read} where id = {id}
+            """
+          ).on(
+            'id -> this.id,
+            'user -> this.user,
+            'from -> this.from,
+            'notificationType -> this.notificationType.name,
+            'data -> Json.toJson(data).toString(),
+            'read -> this.read
+          ).executeUpdate()
+
+          // Return the notification
+          this
+        } else {
+          // Save the notification
+          val id: Option[Long] = SQL(
+            """
+            insert into notification (`user`, `from`, notificationType, `data`, created, `read`)
+            values ({user}, {from}, {notificationType}, {data}, {created}, {read})
+            """
+          ).on(
+            'user -> this.user,
+            'from -> this.from,
+            'notificationType -> this.notificationType.name,
+            'data -> Json.toJson(data).toString(),
+            'created -> this.created,
+            'read -> this.read
+          ).executeInsert()
+
+          // Return the notification
+          ViktyoNotification(
+            Id(id.get), this.user, this.from, this.notificationType, this.data, this.created, this.read
+          )
+        }
+    }
+  }
+}
+
+object ViktyoNotification {
+  val simple = {
+    get[Pk[Long]]("notification.id") ~
+      get[Long]("notification.user") ~
+      get[Long]("notification.from") ~
+      get[String]("notification.notificationType") ~
+      get[String]("notification.data") ~
+      get[Long]("notification.created") ~
+      get[Boolean]("notification.read") map {
+      case id ~ user ~ from ~ notificationType ~ data ~ created ~ read =>
+        ViktyoNotification(
+          id, user, from, Symbol(notificationType), Json.parse(data).as[Map[String, String]], created, read
+        )
+    }
+  }
+
+  def findById(id: Long): Option[ViktyoNotification] = {
+    DB.withConnection {
+      implicit connection =>
+        SQL("SELECT * from notification where id = {id}").on('id -> id).as(ViktyoNotification.simple.singleOpt)
+    }
+  }
+
+  def listByUser(user: Long): List[ViktyoNotification] = {
+    DB.withConnection {
+      implicit connection =>
+        SQL("SELECT * from notification where user = {user} order by created desc").on('user -> user)
+          .as(ViktyoNotification.simple *)
+    }
+  }
+}

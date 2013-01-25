@@ -103,36 +103,60 @@ case class User(
     User(this.id, this.fullname, this.username, password, this.properties, this.objId)
   }
 
-  // Network functions
+  // Generic Property List functions
 
-  def getNetworks: List[Network] = {
-    if (this.getProperty("networks").isDefined)
-      this.getProperty("networks").get.split(",").map(n => Network.findById(n.toLong).get).toList
+  def getPropertyList(attribute: String): List[Long] = {
+    if (this.getProperty(attribute).isDefined)
+      this.getProperty(attribute).get.split(",").map(s => s.toLong).toList
     else
       List()
   }
 
-  def addNetwork(network: Network): User = {
-    if (this.getProperty("networks").isDefined)
-      this.setProperty("networks", this.getProperty("networks").get + "," + network.id.get)
+  def addToPropertyList(attribute: String, value: Long): User = {
+    if (this.getProperty(attribute).isDefined)
+      this.setProperty(attribute, this.getProperty(attribute).get + "," + value)
     else
-      this.setProperty("networks", network.id.get.toString)
+      this.setProperty(attribute, value.toString)
   }
 
-  def removeNetwork(network: Network): User = {
-    if (this.getProperty("networks").isDefined)
-      this.setProperty("networks",
-        this.getProperty("networks").get.split(",").filterNot(n => n == network.id.get.toString).mkString(","))
+  def removeFromPropertyList(attribute: String, value: Long): User = {
+    if (this.getProperty(attribute).isDefined)
+      this.setProperty(attribute,
+        this.getProperty(attribute).get.split(",").filterNot(p => p == value.toString).mkString(","))
     else
       this
   }
 
-  def hasNetwork(network: Network): Boolean = {
-    if (this.getProperty("networks").isDefined)
-      this.getProperty("networks").get.split(",").map(n => n.toLong).filter(l => l == network.id.get).size > 0
+  def hasInPropertyList(attribute: String, value: Long): Boolean = {
+    if (this.getProperty(attribute).isDefined)
+      this.getProperty(attribute).get.split(",").map(n => n.toLong).filter(l => l == value).size > 0
     else
       false
   }
+
+  // Network functions
+  def getNetworks: List[Network] = getPropertyList("networks").map(n => Network.findById(n).get)
+  def addNetwork(network: Network): User = addToPropertyList("networks", network.id.get)
+  def removeNetwork(network: Network): User = removeFromPropertyList("networks", network.id.get)
+  def hasNetwork(network: Network): Boolean = hasInPropertyList("networks", network.id.get)
+
+  // Favorite functions
+  def getFavorites: List[Posting] = getPropertyList("favorites").map(n => Posting.findById(n).get)
+  def addFavorite(posting: Posting): User = addToPropertyList("favorites", posting.id.get)
+  def removeFavorite(posting: Posting): User = removeFromPropertyList("favorites", posting.id.get)
+  def hasFavorite(posting: Posting): Boolean = hasInPropertyList("favorites", posting.id.get)
+
+  // Following functions
+  def getFollowing: List[User] = getPropertyList("following").map(n => User.findById(n).get)
+  def addFollowing(user: User): User = addToPropertyList("following", user.id.get)
+  def removeFollowing(user: User): User = removeFromPropertyList("following", user.id.get)
+  def hasFollowing(user: User): Boolean = hasInPropertyList("following", user.id.get)
+
+  // Follower functions
+  def getFollower: List[User] = getPropertyList("followers").map(n => User.findById(n).get)
+  def addFollower(user: User): User = addToPropertyList("followers", user.id.get)
+  def removeFollower(user: User): User = removeFromPropertyList("followers", user.id.get)
+  def hasFollower(user: User): Boolean = hasInPropertyList("followers", user.id.get)
 }
 
 object User {

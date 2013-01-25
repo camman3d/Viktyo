@@ -70,6 +70,10 @@ case class ActivityStream(
 
   def delete() {
     DB.withConnection { implicit connection =>
+      if (verb == "comment" || verb == "statusUpdate")
+        Text.findById(obj).get.delete()
+      if (verb == "imagePost")
+        Image.findById(obj).get.delete()
       SQL("delete from activity_stream where id = {id}").on('id -> this.id.get).executeUpdate()
     }
   }
@@ -84,6 +88,19 @@ object ActivityStream {
       get[Long]("activity_stream.obj") ~
       get[Long]("activity_stream.target") map {
       case id~published~actor~verb~obj~target => ActivityStream(id, published, User.findById(actor).get, verb, obj, target)
+    }
+  }
+
+  def find(user: User, verb: String, obj: Long, target: Long): Option[ActivityStream] = {
+    DB.withConnection { implicit connection =>
+      SQL(
+        "select * from activity_stream where user = {user}, verb = {verb}, obj = {obj}, target = {target}"
+      ).on(
+        'user -> user.id.get,
+        'verb -> verb,
+        'obj -> obj,
+        'target -> target
+      ).as(ActivityStream.simple.singleOpt)
     }
   }
 
@@ -133,6 +150,18 @@ object ActivityStream {
 
   def createImagePost(user: User, image: Image, target: Long): ActivityStream = {
     ActivityStream(NotAssigned, new Date().getTime, user, "imagePost", image.objId, target)
+  }
+
+  def createFavorite(user: User, posting: Posting): ActivityStream = {
+    ActivityStream(NotAssigned, new Date().getTime, user, "favorite", posting.objId, posting.objId)
+  }
+
+  def createFollowPosting(user: User, posting: Posting): ActivityStream = {
+    ActivityStream(NotAssigned, new Date().getTime, user, "follow", posting.objId, user.objId)
+  }
+
+  def createFollowUser(user: User, otherUser: User): ActivityStream = {
+    ActivityStream(NotAssigned, new Date().getTime, user, "follow", otherUser.objId, user.objId)
   }
 
   /**
