@@ -7,7 +7,21 @@ import anorm.SqlParser._
 import anorm.~
 import org.apache.commons.lang3.StringEscapeUtils
 import play.api.libs.json.Json
+import java.util.Date
 
+/**
+ * Possible notifications
+ * 'following and (follower -> userId) means "So and so is now following you"
+ * 'message and (message -> message) means a user to user message
+ *
+ * @param id The id
+ * @param user The user this notification is directed to
+ * @param from The user this is from (-1 for system notification)
+ * @param notificationType Can be 'following or 'message
+ * @param data Data to be used in displaying the message
+ * @param created Time of notification
+ * @param read Has the recieved read this yet?
+ */
 case class ViktyoNotification(
                                id: Pk[Long],
                                user: Long,
@@ -27,7 +41,7 @@ case class ViktyoNotification(
           SQL(
             """
             update notification
-            set `user` = {user}, `from` = {from}, notificationType = {notificationType}, `data` = {data}, created = {created},
+            set user = {user}, `from` = {from}, notificationType = {notificationType}, data = {data}, created = {created},
             `read` = {read} where id = {id}
             """
           ).on(
@@ -45,7 +59,7 @@ case class ViktyoNotification(
           // Save the notification
           val id: Option[Long] = SQL(
             """
-            insert into notification (`user`, `from`, notificationType, `data`, created, `read`)
+            insert into notification (user, `from`, notificationType, data, created, `read`)
             values ({user}, {from}, {notificationType}, {data}, {created}, {read})
             """
           ).on(
@@ -64,6 +78,9 @@ case class ViktyoNotification(
         }
     }
   }
+
+  def markRead: ViktyoNotification =
+    ViktyoNotification(this.id, this.user, this.from, this.notificationType, this.data, this.created, true)
 }
 
 object ViktyoNotification {
@@ -96,4 +113,12 @@ object ViktyoNotification {
           .as(ViktyoNotification.simple *)
     }
   }
+
+  def createFollowing(follower: User, following: User): ViktyoNotification =
+    ViktyoNotification(NotAssigned, following.id.get, -1, 'following, Map("follower" -> follower.id.get.toString),
+      new Date().getTime, false)
+
+  def createMessage(sender: User, receiver: User, message: String): ViktyoNotification =
+    ViktyoNotification(NotAssigned, receiver.id.get, sender.id.get, 'message, Map("message" -> message),
+      new Date().getTime, false)
 }

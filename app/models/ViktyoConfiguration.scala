@@ -7,11 +7,31 @@ import anorm.SqlParser._
 import anorm.~
 import org.apache.commons.lang3.StringEscapeUtils
 
+/**
+ * home.banner.backgrounds
+ * home.banner.titles
+ * home.featured
+ * ...
+ * signup.availableFields
+ * signup.availableFieldsTypes
+ * signup.requiredFields
+ * profile.availableFields
+ * profile.availableFieldsTypes
+ * posting.types
+ * posting.colors (same order)
+ * posting.defaultFields
+ * posting.defaultFieldsTypes
+ * posting.requiredFields
+ *
+ * @param id
+ * @param name
+ * @param data
+ */
 case class ViktyoConfiguration(
-  id: Pk[Long],
-  name: String,
-  data: Either[String, List[String]]
-) {
+                                id: Pk[Long],
+                                name: String,
+                                data: Either[String, List[String]]
+                                ) {
 
   def getDataType: String = {
     if (data.isLeft)
@@ -27,42 +47,46 @@ case class ViktyoConfiguration(
       data.right.get.map(s => StringEscapeUtils.escapeCsv(s)).mkString(",")
   }
 
+  def setData(data: String): ViktyoConfiguration =
+    ViktyoConfiguration(this.id, this.name, ViktyoConfiguration.buildDataFromString(getDataType, data))
+
   def save: ViktyoConfiguration = {
-    DB.withConnection { implicit connection =>
-      if (this.id.isDefined) {
-        // Save the configuration
-        SQL(
-          """
+    DB.withConnection {
+      implicit connection =>
+        if (this.id.isDefined) {
+          // Save the configuration
+          SQL(
+            """
             update configuration
             set name = {name}, dataType = {dataType}, data: {data}
             where id = {id}
-          """
-        ).on(
-          'id -> this.id,
-          'name -> this.name,
-          'dataType -> this.getDataType,
-          'data -> this.getDataString
-        ).executeUpdate()
+            """
+          ).on(
+            'id -> this.id,
+            'name -> this.name,
+            'dataType -> this.getDataType,
+            'data -> this.getDataString
+          ).executeUpdate()
 
-        // Return the configuration
-        ViktyoConfiguration(this.id, this.name, this.data)
-      } else {
-        // Save the configuration
-        val id: Option[Long] = SQL(
-          """
+          // Return the configuration
+          ViktyoConfiguration(this.id, this.name, this.data)
+        } else {
+          // Save the configuration
+          val id: Option[Long] = SQL(
+            """
             insert into configuration (name, dataType, data)
             values ({name}, {dataType}, {data})
-          """
-        ).on(
-          'name -> this.name,
-          'name -> this.name,
-          'dataType -> this.getDataType,
-          'data -> this.getDataString
-        ).executeInsert()
+            """
+          ).on(
+            'name -> this.name,
+            'name -> this.name,
+            'dataType -> this.getDataType,
+            'data -> this.getDataString
+          ).executeInsert()
 
-        // Return the configuration
-        ViktyoConfiguration(Id(id.get), this.name, this.data)
-      }
+          // Return the configuration
+          ViktyoConfiguration(Id(id.get), this.name, this.data)
+        }
     }
   }
 }
@@ -80,19 +104,28 @@ object ViktyoConfiguration {
       get[String]("configuration.name") ~
       get[String]("configuration.dataType") ~
       get[String]("configuration.data") map {
-      case id~name~dataType~data => ViktyoConfiguration(id, name, buildDataFromString(dataType, data))
+      case id ~ name ~ dataType ~ data => ViktyoConfiguration(id, name, buildDataFromString(dataType, data))
     }
   }
 
   def findById(id: Long): Option[ViktyoConfiguration] = {
-    DB.withConnection { implicit connection =>
-      SQL("SELECT * from configuration where id = {id}").on('id -> id).as(ViktyoConfiguration.simple.singleOpt)
+    DB.withConnection {
+      implicit connection =>
+        SQL("SELECT * from configuration where id = {id}").on('id -> id).as(ViktyoConfiguration.simple.singleOpt)
     }
   }
 
   def findByName(name: String): Option[ViktyoConfiguration] = {
-    DB.withConnection { implicit connection =>
-      SQL("SELECT * from configuration where name = {name}").on('name -> name).as(ViktyoConfiguration.simple.singleOpt)
+    DB.withConnection {
+      implicit connection =>
+        SQL("SELECT * from configuration where name = {name}").on('name -> name).as(ViktyoConfiguration.simple.singleOpt)
+    }
+  }
+
+  def list: List[ViktyoConfiguration] = {
+    DB.withConnection {
+      implicit connection =>
+        SQL("SELECT * from configuration").as(ViktyoConfiguration.simple *)
     }
   }
 }

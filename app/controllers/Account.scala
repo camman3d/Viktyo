@@ -1,7 +1,7 @@
 package controllers
 
 import play.api.mvc.{RequestHeader, Action, Controller}
-import models.User
+import models.{ViktyoNotification, User}
 import anorm.NotAssigned
 import tools.Hasher
 import java.util.Date
@@ -166,5 +166,35 @@ object Account extends Controller {
       User.findByUsername(request.session("username"))
     else
       None
+  }
+
+  def notifications = Action { implicit request =>
+    // Check that the user is logged in
+    val user = getCurrentUser
+    if (user.isDefined) {
+
+      val notifications = ViktyoNotification.listByUser(user.get.id.get)
+      Ok // TODO: Redirect with message
+
+    } else // Not logged in
+      Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+  }
+
+  def readNotification = Action(parse.urlFormEncoded) { implicit request =>
+
+    // Check that the user is logged in
+    val user = getCurrentUser
+    if (user.isDefined) {
+
+      // Check that the notification he is reading is real and his
+      val notification = ViktyoNotification.findById(request.body("notification")(0).toLong)
+      if(notification.isDefined && notification.get.user == user.get) {
+        notification.get.markRead.save
+        Ok // TODO: Redirect with message
+
+      } else
+        Ok // TODO: Redirect with message
+    } else // Not logged in
+      Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 }

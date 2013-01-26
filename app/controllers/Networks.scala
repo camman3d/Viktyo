@@ -1,7 +1,7 @@
 package controllers
 
 import play.api.mvc.{Action, Controller}
-import models.{Image, ActivityStream, Network}
+import models.{User, Image, ActivityStream, Network}
 import tools.{ImageUploader, Hasher}
 import java.util.Date
 import anorm.NotAssigned
@@ -117,6 +117,46 @@ object Networks extends Controller {
         val network = Network.findById(id)
         if (network.isDefined) {
           user.get.addNetwork(network.get).save
+          network.get.addMember(user.get).save
+          Ok // TODO: Redirect with message
+
+        } else // Network doesn't exist
+          Ok // TODO: Redirect with message
+      } else // User not logged in
+        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+  }
+
+  def leaveNetwork(id: Long) = Action {
+    implicit request =>
+
+    // Check that the user is logged in
+      val user = Account.getCurrentUser
+      if (user.isDefined) {
+
+        // Check that the network is real
+        val network = Network.findById(id)
+        if (network.isDefined) {
+          user.get.removeNetwork(network.get).save
+          network.get.removeMember(user.get).save
+          Ok // TODO: Redirect with message
+
+        } else // Network doesn't exist
+          Ok // TODO: Redirect with message
+      } else // User not logged in
+        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+  }
+
+  def viewMembers(id: Long) = Action {
+    implicit request =>
+
+      // Check that the user is logged in and is an organization
+      val user = Account.getCurrentUser
+      if (user.isDefined && user.get.getProperty("accountType") == "organization") {
+
+        // Check that the network is real
+        val network = Network.findById(id)
+        if (network.isDefined) {
+          val members = network.get.getMembers
           Ok // TODO: Redirect with message
 
         } else // Network doesn't exist

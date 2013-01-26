@@ -86,6 +86,45 @@ case class Network(
   def removeProperty(attribute: String): Network = {
     Network(this.id, this.name, this.description, this.properties.filterNot(p => p.attribute == attribute), this.objId)
   }
+
+  // Generic Property List functions
+
+  def getPropertyList(attribute: String): List[Long] = {
+    if (this.getProperty(attribute).isDefined)
+      this.getProperty(attribute).get.split(",").map(s => s.toLong).toList
+    else
+      List()
+  }
+
+  def addToPropertyList(attribute: String, value: Long): Network = {
+    if (this.getProperty(attribute).isDefined)
+      this.setProperty(attribute, this.getProperty(attribute).get + "," + value)
+    else
+      this.setProperty(attribute, value.toString)
+  }
+
+  def removeFromPropertyList(attribute: String, value: Long): Network = {
+    if (this.getProperty(attribute).isDefined)
+      this.setProperty(attribute,
+        this.getProperty(attribute).get.split(",").filterNot(p => p == value.toString).mkString(","))
+    else
+      this
+  }
+
+  def hasInPropertyList(attribute: String, value: Long): Boolean = {
+    if (this.getProperty(attribute).isDefined)
+      this.getProperty(attribute).get.split(",").map(n => n.toLong).filter(l => l == value).size > 0
+    else
+      false
+  }
+
+  // Members
+  def getMembers: List[User] = getPropertyList("members").map(n => User.findById(n).get)
+  def addMember(member: User): Network = addToPropertyList("members", member.id.get)
+  def removeMember(member: User): Network = removeFromPropertyList("members", member.id.get)
+  def hasMember(member: User): Boolean = hasInPropertyList("members", member.id.get)
+
+
 }
 
 object Network {

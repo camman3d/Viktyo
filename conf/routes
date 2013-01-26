@@ -22,6 +22,8 @@ GET     /account                        controllers.Account.profile
 POST    /account/changePassword         controllers.Account.changePassword
 POST    /account/setProperty            controllers.Account.setProperty
 POST    /account/removeProperty         controllers.Account.removeProperty
+GET     /account/notifications          controllers.Account.notifications
+POST    /account/notifications/read     controllers.Account.readNotification
 
 # Home
 GET     /home                           controllers.Home.feed
@@ -32,6 +34,7 @@ POST    /home/add/image                 controllers.Home.addImage
 GET     /network                        controllers.Networks.browse
 GET     /network/:id                    controllers.Networks.networkFeed(id: Long)
 POST    /network/:id/join               controllers.Networks.joinNetwork(id: Long)
+POST    /network/:id/leave              controllers.Networks.leaveNetwork(id: Long)
 POST    /network/:id/add/statusUpdate   controllers.Networks.addStatusUpdate(id: Long)
 POST    /network/:id/add/image          controllers.Networks.addImage(id: Long)
 
@@ -52,6 +55,13 @@ GET     /posting/:id/unfavorite         controllers.Postings.unfavorite(id: Long
 
 # Users
 GET     /users/:id                      controllers.Users.view(id: Long)
+GET     /users/:id/follow               controllers.Users.follow(id: Long)
+GET     /users/:id/unfollow             controllers.Users.unfollow(id: Long)
+GET     /users/:id/message              controllers.Users.message(id: Long)
+POST    /users/:id/message              controllers.Users.sendMessage(id: Long)
+
+# Admin
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
