@@ -5,6 +5,9 @@ import play.api.db._
 import play.api.Play.current
 import anorm.Id
 import anorm.SqlParser._
+import play.api.libs.json._
+import play.api.libs.json.util._
+import play.api.libs.json.Writes._
 
 case class User(
                  id: Pk[Long],
@@ -69,6 +72,13 @@ case class User(
         SQL("delete from viktyo_object where id = {id}").on('id -> this.objId)
     }
   }
+
+  def toJson: JsObject =
+    Json.obj(
+      "id" -> this.id.get,
+      "username" -> this.username,
+      "fullname" -> this.fullname
+    )
 
   def getProperty(attribute: String): Option[String] = {
     val property = this.properties.find(p => p.attribute == attribute)
@@ -273,7 +283,6 @@ object User {
           SELECT object.id, user.*
           FROM object
           JOIN user ON ( user.id = object.objId )
-          JOIN property ON ( object.id = property.objId)
           WHERE object.objType = {userType}
           limit {pageSize} offset {offset}
           """
@@ -312,4 +321,25 @@ object User {
         count > 0
     }
   }
+
+  def search(searchString: String): List[User] = {
+    DB.withConnection {
+      implicit connection =>
+        SQL(
+          """
+          SELECT object.id, user.*
+          FROM object
+          JOIN user ON ( user.id = object.objId )
+          WHERE object.objType = {userType}
+          AND (user.username COLLATE UTF8_GENERAL_CI LIKE {username}
+          OR user.fullname COLLATE UTF8_GENERAL_CI LIKE {fullname})
+          """
+        ).on(
+          'userType -> ViktyoObject.typeMap('user),
+          'username -> ("%" + searchString + "%"),
+          'fullname -> ("%" + searchString + "%")
+        ).as(User.simple *)
+    }
+  }
+
 }

@@ -1,6 +1,7 @@
 package controllers
 
 import play.api._
+import libs.json.{JsArray, Json}
 import play.api.mvc._
 import models._
 import anorm.NotAssigned
@@ -24,6 +25,30 @@ object Application extends Controller {
 
 //    Ok
     Ok(views.html.index())
+  }
+
+  def search = Action(parse.urlFormEncoded) { implicit request =>
+//    try {
+      val searchString = request.body("search")(0)
+      val allUsers = User.search(searchString)
+      val users = allUsers.filter(u => {
+        val atype = u.getProperty("accountType").get
+        atype == "user" || atype == "admin"
+      })
+      val organizations = allUsers.filter(u => u.getProperty("accountType").get == "organization")
+      val postings = Posting.search(searchString)
+
+
+
+      Ok(Json.obj(
+        "users" -> JsArray(users.map(u => u.toJson)),
+        "postings" -> JsArray(postings.map(p => p.toJson)),
+        "organizations" -> JsArray(organizations.map(u => u.toJson))
+      ))
+
+//    } catch {
+//      case _ => BadRequest(Json.obj("success" -> false))
+//    }
   }
   
 }

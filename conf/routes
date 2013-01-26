@@ -4,6 +4,7 @@
 
 # Home page
 GET     /                               controllers.Application.index
+POST    /search                         controllers.Application.search
 
 # Authentication
 POST    /auth/login                     controllers.Account.login
