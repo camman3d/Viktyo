@@ -61,7 +61,12 @@ GET     /users/:id/message              controllers.Users.message(id: Long)
 POST    /users/:id/message              controllers.Users.sendMessage(id: Long)
 
 # Admin
-
+GET     /admin                          controllers.Admin.dashboard
+GET     /admin/config                   controllers.Admin.configure
+POST    /admin/config/set               controllers.Admin.setConfiguration
+GET     /admin/users                    controllers.Admin.users
+GET     /admin/users/:id/delete         controllers.Admin.deleteUser(id: Long)
+GET     /admin/users/:id/toggleAdmin    controllers.Admin.toggleAdmin(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
