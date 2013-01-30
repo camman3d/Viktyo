@@ -24,7 +24,7 @@ object Application extends Controller {
 //    val user = User(NotAssigned, "Josh", "camman3d", Hasher.sha256Base64("Fr-21j0$h")).save
 
 //    Ok
-    Ok(views.html.index())
+    Ok(views.html.application.index())
   }
 
   def search = Action(parse.urlFormEncoded) { implicit request =>

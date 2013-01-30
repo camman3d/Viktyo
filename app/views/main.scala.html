@@ -1,15 +1,292 @@
-@(title: String)(content: Html)(implicit request: RequestHeader)
+@(nav: String, title: String)(content: Html)(implicit request: RequestHeader, user: Option[User] = None)
 
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/html">
     <head>
         <title>@title</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-responsive.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.ico")">
+
         <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
     </head>
     <body>
+    <!-- Main container -->
+        <div class="container" id="header-bar">
+            <div class="row">
+                <div class="span12">
+                <!-- VIKTYO logo -->
+                    <span class="pull-left">
+                        <a href="@routes.Application.index()" class="no-underline">
+                        <img src="/assets/images/main/headerLogo.png" alt="Viktyo"/>
+                        </a>
+                    </span>
+
+                <!-- Feedback link -->
+                    <span class="pull-left header-links">
+                        <div id="feedbackBar"></div>
+                        <div id="feedbackLink">
+                            <div class="header-middle-spacer"></div>
+                            <span class="header-link header-link-orange">
+                                <a href="#feedbackModal" data-toggle="modal">Submit Feedback</a>
+                            </span>
+                        </div>
+                    </span>
+
+                <!-- Header links -->
+                    <span class="pull-right header-links">
+                        <div class="header-middle-spacer"></div>
+                        @active(str: String) = {
+                            @if(nav == str) {
+                                active
+                            }
+                        }
+                        @if(!user.isDefined) {
+
+                                <!-- Links when no user is logged in -->
+                                <span class="header-link pad-right-med   @active("index")">
+                                    <a href="@routes.Application.index()">How it works</a>
+                                </span>
+                                <span class="header-link pad-right-med   @active("about")">
+                                    <a href="#">About</a>
+                                </span>
+                                <span class="header-link pad-right-low   @active("signup")">
+                                    <a href="@routes.Account.signup()"><strong>Sign Up</strong></a>
+                                </span>
+                                <span class="vertical-bar"></span>
+                                <span class="header-link pad-left-low header-link-orange">
+                                    <a href="#loginModal" data-toggle="modal"><strong>Login</strong></a>
+                                </span>
+                        } else {
+
+                                <!-- Links when a user is logged in -->
+                                <span class="header-link pad-right-med   @active("postingsMap")">
+                                    <a href="@routes.Postings.browseMap()">Listings</a>
+                                </span>
+                                <span class="header-link pad-right-med   @active("organizationsList")">
+                                    <a href="@routes.Organizations.browseList()">Organizations</a>
+                                </span>
+
+                                <!-- Notifications Badge -->
+                                <a href="@routes.Account.notifications()">
+                                @defining(models.ViktyoNotification.listByUser(user.get.id.get)) { notifications =>
+                                    <span class="badge badge-warning pad-right-med">@notifications.count(n => !n.read)</span>
+                                }
+                                </a>
+
+                                <!-- Profile Picture -->
+                                <img id="header-user-image" class="header-image profile-pic-small pad-right-med"
+                                    src="@user.get.getProfilePictureUrl" alt="You!"/>
+
+                                <!-- Name and Dropdown Menu -->
+                                <span class="header-link header-link-orange">
+                                    <a href="#" id="header-user">
+                                        <strong>@user.get.fullname</strong> <b class="caret"></b>
+                                    </a>
+                                </span>
+
+                                <div id="dropdown-menu">
+
+                                <!-- Profile Picture -->
+                                <img id="header-user-image-dropdown" class="header-image profile-pic-small pad-right-med"
+                                    src="@user.get.getProfilePictureUrl" alt="You!"/>
+                                    <span class="header-link header-link-orange" id="header-user-dropdown">
+                                        <a href="#">
+                                            <strong>@user.get.fullname</strong> <b class="caret caret-up"></b>
+                                        </a>
+                                    </span>
+
+                                <!-- Links -->
+                                    <div class="divider"></div>
+                                    <span class="header-link">
+                                        <i class="icon-user"></i>
+                                        <a href="@routes.Account.profile()">Profile</a>
+                                    </span>
+                                    <div class="divider"></div>
+                                    <span class="header-link">
+                                        <i class="icon-home"></i>
+                                        <a href="@routes.Home.feed()">Home</a>
+                                    </span>
+                                    <div class="divider"></div>
+                                    <span class="header-link">
+                                        <i class="icon-star"></i>
+                                        <a href="#">Favorites</a>
+                                    </span>
+                                    <div class="divider"></div>
+                                    <span class="header-link">
+                                        <i class="icon-off"></i>
+                                        <a href="@routes.Account.logout()">Logout</a>
+                                    </span>
+                                </div>
+                        }
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal modal-med hide fade" id="loginModal">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body with-footer">
+                <div class="row-fluid">
+                    <div class="span7">
+                        <h3>The proverbial high five.</h3>
+                        <form action="@routes.Account.login()" method="@routes.Account.login().method">
+                            <div style="color: #666" class="pad-top-med">
+                                Email
+                            </div>
+                            <div class="pad-top-low">
+                            <input class="full-width" type="text" name="email"/>
+                            </div>
+
+
+                            <div style="color: #666" class="pad-top-low">
+                                Password
+                            </div>
+                            <div class="pad-top-low">
+                            <input class="full-width" type="password" name="password"/>
+                            </div>
+
+                            <input type="hidden" name="type" value="user"/>
+                            <div class="pad-top-low">
+                            <input type="submit" class="btn btn-warning" value="Log In"/>
+                                <span class="pad-left-med">
+                                    <a href="@routes.Account.forgotPassword()">Forgot your password?</a>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="span5">
+                        <div style="border-left: 1px solid #ddd; padding: 8px 0 11px 20px; margin: 15px 0 0 10px;">
+                            <div style="text-align: center; color: #aaa;">
+                                <em><strong>Key features</strong></em>
+                            </div>
+                            <div class="pad-top-high">
+                                <img src="/assets/images/icons/glyphicons_043_group.png" class="pad-right-low">
+                                Follow organizations
+                            </div>
+                            <div class="pad-top-med">
+                                <img src="/assets/images/icons/glyphicons_027_search.png" class="pad-right-low">
+                                Search for opportunities
+                            </div>
+                            <div class="pad-top-med">
+                                <img src="/assets/images/icons/glyphicons_004_girl.png" class="pad-right-low">
+                                Find your friends
+                            </div>
+                            <div class="pad-top-med">
+                                <img src="/assets/images/icons/glyphicons_340_globe.png" class="pad-right-low">
+                                See the world
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span class="pull-left" style="color: #666;">
+                    Not a member yet? Extend your life by 25 minutes and <a href="@routes.Account.signup()">
+                    sign up now!
+                </a>
+                </span>
+            </div>
+        </div>
+        <div class="modal modal-med hide fade" id="feedbackModal">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <h3>Help us, help you</h3>
+                <div class="row-fluid pad-top-med">
+                    <div class="span2">
+                        <span class="pull-left" style="margin-top: 10px; font-weight: bold">
+                            Email:
+                        </span>
+                    </div>
+                    <div class="span10">
+                    <input type="text" placeholder="i.e. the_boss  @@ viktyo.com" id="feedbackEmail"/>
+                    </div>
+                </div>
+                <div class="row-fluid pad-top-med">
+                    <div class="span2">
+                        <span class="pull-left" style="margin-top: 10px; font-weight: bold">
+                            Subject:
+                        </span>
+                    </div>
+                    <div class="span10">
+                    <input type="text" placeholder="i.e. Bug report" id="feedbackSubject"/>
+                    </div>
+                </div>
+                <div class="pad-top-low">
+                    <span style="font-weight: bold">Comments:</span>
+                    <textarea class="pad-top-low" rows="5" cols="5" placeholder="Write something..." id="feedbackComments"></textarea>
+                </div>
+                <div class="pad-top-med">
+                    <button class="btn submitBtn" id="feedbackSubmit"></button>
+                </div>
+            </div>
+        </div>
+
+        @if(nav != "home") {
+            <div class="container" id="container">
+            <!-- Messages/alerts -->
+                @if(request.flash.get("alert").isDefined) {
+                    <div class="alert">
+                        <a class="close" data-dismiss="alert">&times;</a>
+                        <strong>Just a sec...</strong> @request.flash("alert")
+                    </div>
+                }
+                @if(request.flash.get("error").isDefined) {
+                    <div class="alert alert-error">
+                        <a class="close" data-dismiss="alert">&times;</a>
+                        <strong>Oh snap!</strong> @request.flash("error")
+                    </div>
+                }
+                @if(request.flash.get("success").isDefined) {
+                    <div class="alert alert-success">
+                        <a class="close" data-dismiss="alert">&times;</a>
+                        <strong>All right!</strong> @request.flash("success")
+                    </div>
+                }
+                @if(request.flash.get("info").isDefined) {
+                    <div class="alert alert-info">
+                        <a class="close" data-dismiss="alert">&times;</a>
+                        <strong>Heads up.</strong> @request.flash("info")
+                    </div>
+                }
+            </div>
+        }
+
         @content
+
+
+        <footer>
+            <div id="footer">
+                <div class="container">
+                <img src="/assets/images/footer/footer_logo.png"/>
+                    <a class="footer-link" href="#">How it Works</a>
+                    <a class="footer-link" href="#">Browse</a>
+                    <a class="footer-link" href="#">About</a>
+                    <a class="footer-link" href="#">Sign Up</a>
+                    <a class="footer-link" href="#">Sitemap</a>
+                    <a class="footer-link" href="#">Privacy</a>
+                    <a class="footer-link" href="#">Terms of Use</a>
+                    <a class="footer-link" href="#">Contact</a>
+                    <span class="footer-copyright">Copyright 2012 VIKTYO, All rights reserved.</span>
+
+                    <span class="pull-right">
+                        <a href="http://www.facebook.com/VIKTYO" class="footer-social" id="footer-facebook"></a>
+                        <a href="http://twitter.com/viktyo" class="footer-social" id="footer-twitter"></a>
+                        <a href="http://www.linkedin.com/groups/VIKTYO-4563662?gid=4563662" class="footer-social" id="footer-linkedin"></a>
+                        <a href="https://plus.google.com/102815925269297830696/posts" class="footer-social" id="footer-google-plus"></a>
+                        <a href="http://www.youtube.com/user/viktyo" class="footer-social" id="footer-youtube"></a>
+                    </span>
+                </div>
+            </div>
+        </footer>
+
     </body>
 </html>

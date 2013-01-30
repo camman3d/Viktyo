@@ -113,6 +113,10 @@ case class User(
     User(this.id, this.fullname, this.username, password, this.properties, this.objId)
   }
 
+  def getProfilePicture: Option[String] = getProperty("profilePicture")
+
+  def getProfilePictureUrl: String = getProfilePicture.getOrElse("/assets/images/profile-pic-placeholder.jpg")
+
   // Generic Property List functions
 
   def getPropertyList(attribute: String): List[Long] = {
