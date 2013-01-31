@@ -44,7 +44,7 @@ $(function() {
     });
 
     // Set up the modals
-    $("#loginModal").modal({show:false});
+    //$("#loginModal").modal({show:false});
     $("#feedbackModal").modal({show: false});
     $("#feedbackSubmit").click(function() {
         var email = $("#feedbackEmail").val();

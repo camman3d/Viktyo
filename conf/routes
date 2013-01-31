@@ -14,6 +14,7 @@ GET     /auth/signup/user               controllers.Account.signupUser
 GET     /auth/signup/organization       controllers.Account.signupOrganization
 POST    /auth/signup/user               controllers.Account.createUserAccount
 POST    /auth/signup/organization       controllers.Account.createOrganizationAccount
+GET     /auth/forgotPassword            controllers.Account.forgotPasswordPage
 POST    /auth/forgotPassword            controllers.Account.forgotPassword
 GET     /auth/passwordReset/:code       controllers.Account.passwordResetPage(code: String)
 POST    /auth/passwordReset/:code       controllers.Account.passwordReset(code: String)

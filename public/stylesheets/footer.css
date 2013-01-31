@@ -1,0 +1,66 @@
+/* Footer Styling */
+
+footer {
+    margin-top: 80px;
+}
+#footer {
+    width: 100%;
+    min-height: 32px;
+    background: #323332;
+    color: #666;
+    padding-top: 14px;
+    font-weight: bold;
+    font-size: 10px;
+}
+#footer.fixed {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+}
+.footer-link {
+    color: #676766;
+    margin-left: 25px;
+}
+.footer-link:hover {
+    color: #aaa;
+    text-decoration: none;
+}
+.footer-copyright {
+    font-weight: normal;
+    margin-left: 30px;
+}
+.footer-social {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+}
+#footer-facebook {
+    background: url("/assets/images/footer/facebook.png") top left no-repeat;
+}
+#footer-facebook:hover {
+    background-position: -15px;
+}
+#footer-google-plus {
+    background: url("/assets/images/footer/googleplus.png") top left no-repeat;
+}
+#footer-google-plus:hover {
+    background-position: -15px;
+}
+#footer-linkedin {
+    background: url("/assets/images/footer/linkedin.png") top left no-repeat;
+}
+#footer-linkedin:hover {
+    background-position: -15px;
+}
+#footer-twitter {
+    background: url("/assets/images/footer/twitter.png") top left no-repeat;
+}
+#footer-twitter:hover {
+    background-position: -15px;
+}
+#footer-youtube {
+    background: url("/assets/images/footer/youtube.png") top left no-repeat;
+}
+#footer-youtube:hover {
+    background-position: -15px;
+}

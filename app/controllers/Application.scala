@@ -24,6 +24,7 @@ object Application extends Controller {
 //    val user = User(NotAssigned, "Josh", "camman3d", Hasher.sha256Base64("Fr-21j0$h")).save
 
 //    Ok
+    implicit val user = Account.getCurrentUser
     Ok(views.html.application.index())
   }
 

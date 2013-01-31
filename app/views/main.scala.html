@@ -8,6 +8,9 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-responsive.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/header.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/modal.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/footer.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.ico")">
 
         <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
@@ -128,7 +131,74 @@
             </div>
         </div>
 
-        <div class="modal modal-med hide fade" id="loginModal">
+        <!-- Login Modal -->
+    <div id="loginModal" class="modal modal-med hide fade" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="row-fluid">
+                <div class="span7">
+                    <h3 id="loginModalLabel">The proverbial high five.</h3>
+                    <form action="@routes.Account.login()" method="@routes.Account.login().method">
+                        <div style="color: #666" class="pad-top-med">
+                            Email
+                        </div>
+                        <div class="pad-top-low">
+                        <input class="full-width" type="text" name="username"/>
+                        </div>
+
+
+                        <div style="color: #666" class="pad-top-low">
+                            Password
+                        </div>
+                        <div class="pad-top-low">
+                        <input class="full-width" type="password" name="password"/>
+                        </div>
+
+                    <input type="hidden" name="type" value="user"/>
+                        <div class="pad-top-low">
+                        <input type="submit" class="btn btn-warning" value="Log In"/>
+                            <span class="pad-left-med">
+                                <a href="@routes.Account.forgotPassword()">Forgot your password?</a>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+                <div class="span5">
+                    <div style="border-left: 1px solid #ddd; padding: 8px 0 11px 20px; margin: 15px 0 0 10px;">
+                        <div style="text-align: center; color: #aaa;">
+                            <em><strong>Key features</strong></em>
+                        </div>
+                        <div class="pad-top-high">
+                            <img src="/assets/images/icons/glyphicons_043_group.png" class="pad-right-low">
+                            Follow organizations
+                        </div>
+                        <div class="pad-top-med">
+                            <img src="/assets/images/icons/glyphicons_027_search.png" class="pad-right-low">
+                            Search for opportunities
+                        </div>
+                        <div class="pad-top-med">
+                            <img src="/assets/images/icons/glyphicons_004_girl.png" class="pad-right-low">
+                            Find your friends
+                        </div>
+                        <div class="pad-top-med">
+                            <img src="/assets/images/icons/glyphicons_340_globe.png" class="pad-right-low">
+                            See the world
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <span class="pull-left" style="color: #666;">
+                Not a member yet? Extend your life by 25 minutes and <a href="@routes.Account.signup()">sign up now!</a>
+            </span>
+        </div>
+    </div>
+
+        <!--<div class="modal modal-med hide fade" id="loginModal">
             <div class="modal-header">
                 <a class="close" data-dismiss="modal">&times;</a>
             </div>
@@ -193,7 +263,7 @@
                 </a>
                 </span>
             </div>
-        </div>
+        </div>-->
         <div class="modal modal-med hide fade" id="feedbackModal">
             <div class="modal-header">
                 <a class="close" data-dismiss="modal">&times;</a>

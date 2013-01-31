@@ -1,11 +1,9 @@
-@()(implicit request: RequestHeader)
+@()(implicit request: RequestHeader, user: Option[User] = None)
 
-@main("index", "") {
-    
-    <form action="@routes.Account.login()" method="@routes.Account.login().method">
-        Username: <input type="text" name="username"><br>
-        Password: <input type="password" name="password"><br>
-        <input type="submit">
-    </form>
-    
+@main("index", "VIKTYO") {
+    <h1>Header 1</h1>
+    <h2>Header 2</h2>
+    <h3>Header 3</h3>
+    <h4>Header 4</h4>
+    <h5>Header 5</h5>
 }

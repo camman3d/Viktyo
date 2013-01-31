@@ -19,7 +19,7 @@ object Home extends Controller {
     implicit request =>
 
       // Check that the user is logged in
-      val user = Account.getCurrentUser
+      implicit val user = Account.getCurrentUser
       if (user.isDefined) {
 
         // Create the status update
@@ -33,7 +33,7 @@ object Home extends Controller {
 
   def addImage() = Action(parse.multipartFormData) { implicit request =>
     // Check that the user is logged in
-    val user = Account.getCurrentUser
+    implicit val user = Account.getCurrentUser
     if (user.isDefined) {
 
       // Handle the image upload
@@ -55,7 +55,7 @@ object Home extends Controller {
     implicit request =>
 
     // Check that the user is logged in
-      val user = Account.getCurrentUser
+      implicit val user = Account.getCurrentUser
       if (user.isDefined) {
         val feed = EdgeRank.getFeed(user.get)
         Ok(views.html.account.feed(feed))

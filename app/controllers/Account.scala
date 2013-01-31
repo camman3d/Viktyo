@@ -11,7 +11,9 @@ import java.util.Date
  * These include signing up, logging in, and updating the account.
  */
 object Account extends Controller {
-  def signup = TODO
+  def signup = Action { implicit request =>
+    Ok(views.html.account.signup())
+  }
 
   def signupUser = TODO
 
@@ -74,7 +76,8 @@ object Account extends Controller {
       Ok // TODO: Redirect with new session
   }
 
-  // Ajax call
+  def forgotPasswordPage = TODO
+
   def forgotPassword = Action(parse.urlFormEncoded) {
     implicit request =>
       val username = request.body("username")(0)
@@ -85,10 +88,10 @@ object Account extends Controller {
         val code = Hasher.md5Hex(new Date().getTime + username)
         user.get.setProperty("emailResetCode", code).save
 
-        Ok // TODO: Respond with success message
+        Ok // TODO: Redirect with message
 
       } else // User doesn't exist
-        Ok // TODO: Respond with error message
+        Ok // TODO: Redirect with message
   }
 
   // Password reset page
@@ -100,7 +103,7 @@ object Account extends Controller {
       val password = request.body("password")(0)
 
       // Get the user by the code
-      val user = User.findByProperty("emailResetCode", code)
+      implicit val user = User.findByProperty("emailResetCode", code)
       if (user.isDefined) {
         user.get.removeProperty("emailResetCode").setPassword(Hasher.sha256Base64(password)).save
         Ok
@@ -115,7 +118,7 @@ object Account extends Controller {
     implicit request =>
 
     // Check that the user is logged in
-      val user = getCurrentUser
+      implicit val user = getCurrentUser
       if (user.isDefined) {
         val password = request.body("password")(0)
         user.get.setPassword(Hasher.sha256Base64(password)).save
@@ -128,7 +131,7 @@ object Account extends Controller {
     implicit request =>
 
     // Check that the user is logged in
-      val user = getCurrentUser
+      implicit val user = getCurrentUser
       if (user.isDefined) {
         val attribute = request.body("attribute")(0)
         val value = request.body("value")(0)
@@ -150,7 +153,7 @@ object Account extends Controller {
     implicit request =>
 
     // Check that the user is logged in
-      val user = getCurrentUser
+      implicit val user = getCurrentUser
       if (user.isDefined) {
         val attribute = request.body("attribute")(0)
         user.get.removeProperty(attribute).save
@@ -170,7 +173,7 @@ object Account extends Controller {
 
   def notifications = Action { implicit request =>
     // Check that the user is logged in
-    val user = getCurrentUser
+    implicit val user = getCurrentUser
     if (user.isDefined) {
 
       val notifications = ViktyoNotification.listByUser(user.get.id.get)
@@ -183,7 +186,7 @@ object Account extends Controller {
   def readNotification = Action(parse.urlFormEncoded) { implicit request =>
 
     // Check that the user is logged in
-    val user = getCurrentUser
+    implicit val user = getCurrentUser
     if (user.isDefined) {
 
       // Check that the notification he is reading is real and his

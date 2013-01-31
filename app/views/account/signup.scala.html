@@ -1,0 +1,49 @@
+@()(implicit request: RequestHeader)
+
+@main("signup", "VIKTYO - Sign Up") {
+    <div class="container">
+        <div class="centered">
+            <h1>Go where you wanna go</h1>
+            <h1><small>Sign up now to start exploring the world with VIKTYO.</small></h1>
+
+        <img src="/assets/images/signup/map.jpg" />
+        </div>
+
+        <div class="row">
+            <div class="span3 offset3">
+
+                <div class="centered">
+                    <h3 class="blue">For Individuals</h3>
+                </div>
+
+                <ul>
+                    <li>A list of</li>
+                    <li>benefits</li>
+                    <li>and what a user can do.</li>
+                </ul>
+
+                <div class="centered">
+                    <a class="btn btn-warning" href="@routes.Account.signupUser()">Individual Signup</a>
+                </div>
+
+            </div>
+            <div class="span3">
+                <div class="centered">
+                    <h3 class="blue">For Organizations</h3>
+                </div>
+
+                <ul>
+                    <li>A list of</li>
+                    <li>benefits</li>
+                    <li>and what a user can do.</li>
+                </ul>
+
+                <div class="centered">
+                    <a class="btn btn-warning" href="@routes.Account.signupOrganization()">Organization Signup</a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+}
