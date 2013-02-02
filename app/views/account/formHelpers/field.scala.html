@@ -1,0 +1,8 @@
+@(field: (String, String), required: Boolean, validator: String = "")
+
+@if(field._2 == "text" || field._2 == "password") {
+    @views.html.account.formHelpers.text(field._1, required, field._2, validator)
+}
+@if(field._2 == "file") {
+    @views.html.account.formHelpers.file(field._1, required, field._2, validator)
+}

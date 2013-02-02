@@ -1,0 +1,45 @@
+@()(implicit request: RequestHeader, user: Option[User])
+
+@main("profile", "VIKTYO - Profile") {
+
+    <script src="@routes.Assets.at("javascripts/formValidator.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/fileUpload.js")" type="text/javascript"></script>
+
+    <div class="container">
+        <h1>Account Settings</h1>
+
+        <p>
+            Stuff that can go here...
+            <ul>
+                <li>Password</li>
+                <li>Name</li>
+                <li>Profile Picture</li>
+            </ul>
+        </p>
+
+        <h2>Profile Picture</h2>
+        <form class="form-horizontal validate" action="@routes.Account.profilePicture()" method="@routes.Account.profilePicture().method" enctype="multipart/form-data">
+            @views.html.account.formHelpers.field(("Image", "file"), required = true)
+
+            <div class="control-group">
+                <div class="controls">
+                    <button type="submit" class="btn">Go!</button>
+                </div>
+            </div>
+        </form>
+
+        <h2>Change your password</h2>
+        <form class="form-horizontal validate" action="@routes.Account.changePassword()" method="@routes.Account.changePassword().method">
+            @views.html.account.formHelpers.field(("Password", "password"), required = true)
+            @views.html.account.formHelpers.field(("Password again", "password"), required = true, "match:password")
+
+            <div class="control-group">
+                <div class="controls">
+                    <button type="submit" class="btn">Change</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    
+}

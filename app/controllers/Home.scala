@@ -38,14 +38,12 @@ object Home extends Controller {
 
       // Handle the image upload
       val file = request.body.file("image").get
-      val id = user.get.username + "-" + Hasher.md5Hex(file.filename + new Date().getTime)
-      val uri = ImageUploader.upload(file, id, file.contentType.get)
       val name = request.body.dataParts("name")(0)
-      val image = Image(NotAssigned, name, uri).setProperty("filename", file.filename).save
+      val image = ImageUploader.uploadPicture(file, name)
 
       // Create the update
       ActivityStream.createImagePost(user.get, image, user.get.objId).save
-      Ok(uri) // TODO: Redirect with message
+      Ok(image.uri) // TODO: Redirect with message
 
     } else // User not logged in
       Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
@@ -58,7 +56,20 @@ object Home extends Controller {
       implicit val user = Account.getCurrentUser
       if (user.isDefined) {
         val feed = EdgeRank.getFeed(user.get)
-        Ok(views.html.account.feed(feed))
+        Ok(views.html.home.feed(feed))
+
+      } else // User not logged in
+        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+  }
+
+  def favorites = Action {
+    implicit request =>
+
+    // Check that the user is logged in
+      implicit val user = Account.getCurrentUser
+      if (user.isDefined) {
+        val favorites = user.get.getFavorites
+        Ok // TODO: Create view
 
       } else // User not logged in
         Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")

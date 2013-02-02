@@ -1,0 +1,14 @@
+@(field: (String, String, Boolean), attribute: String)
+
+@required(bool: Boolean) = {
+    @if(bool) {
+        checked="checked"
+    }
+}
+<div class="form-inline pad-bottom-med config" data-config-attr="@attribute">
+    <input type="text" value="@field._1">
+    <label class="checkbox">
+        <input type="checkbox" @required(field._3)> Required
+    </label>
+    <button class="btn btn-small btn-danger">&times;</button>
+</div>

@@ -66,65 +66,52 @@
                                 </span>
                         } else {
 
-                                <!-- Links when a user is logged in -->
-                                <span class="header-link pad-right-med   @active("postingsMap")">
-                                    <a href="@routes.Postings.browseMap()">Listings</a>
-                                </span>
-                                <span class="header-link pad-right-med   @active("organizationsList")">
-                                    <a href="@routes.Organizations.browseList()">Organizations</a>
-                                </span>
+                            <!-- Links when a user is logged in -->
+                            <span class="header-link pad-right-med   @active("postingsMap")">
+                                <a href="@routes.Postings.browseMap()">Listings</a>
+                            </span>
+                            <span class="header-link pad-right-med   @active("organizationsList")">
+                                <a href="@routes.Organizations.browseList()">Organizations</a>
+                            </span>
 
-                                <!-- Notifications Badge -->
-                                <a href="@routes.Account.notifications()">
-                                @defining(models.ViktyoNotification.listByUser(user.get.id.get)) { notifications =>
-                                    <span class="badge badge-warning pad-right-med">@notifications.count(n => !n.read)</span>
-                                }
-                                </a>
+                            <!-- Notifications Badge -->
+                            <a href="@routes.Account.notifications()">
+                            @defining(models.ViktyoNotification.listByUser(user.get.id.get)) { notifications =>
+                                <span class="badge badge-warning pad-right-med">@notifications.count(n => !n.read)</span>
+                            }
+                            </a>
 
-                                <!-- Profile Picture -->
+                            <!-- Profile Picture -->
+                            <a href="@routes.Home.feed()">
                                 <img id="header-user-image" class="header-image profile-pic-small pad-right-med"
                                     src="@user.get.getProfilePictureUrl" alt="You!"/>
+                            </a>
 
-                                <!-- Name and Dropdown Menu -->
-                                <span class="header-link header-link-orange">
-                                    <a href="#" id="header-user">
-                                        <strong>@user.get.fullname</strong> <b class="caret"></b>
-                                    </a>
-                                </span>
+                            <!-- Dropdown Menu -->
+                            <span class="dropdown header-link-orange">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">@user.get.fullname <b class="caret"></b></a>
+                                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
+                                    <li><a tabindex="-1" href="@routes.Home.feed()">
+                                        <i class="icon-home"></i> Home</a></li>
+                                    <li><a tabindex="-1" href="#">
+                                        <i class="icon-star"></i> Favorites</a></li>
+                                    <li><a tabindex="-1" href="@routes.Account.profile()">
+                                        <i class="icon-user"></i> Profile</a></li>
+                                    <li><a tabindex="-1" href="@routes.Account.settings()">
+                                        <i class="icon-wrench"></i> Account Settings</a></li>
 
-                                <div id="dropdown-menu">
+                                    <!-- Link when the uesr is admin -->
+                                    @if(user.get.getProperty("accountType").get == "admin") {
+                                        <li><a tabindex="-1" href="@routes.Admin.dashboard()">
+                                            <i class="icon-cog"></i> Admin Dashboard</a></li>
+                                    }
 
-                                <!-- Profile Picture -->
-                                <img id="header-user-image-dropdown" class="header-image profile-pic-small pad-right-med"
-                                    src="@user.get.getProfilePictureUrl" alt="You!"/>
-                                    <span class="header-link header-link-orange" id="header-user-dropdown">
-                                        <a href="#">
-                                            <strong>@user.get.fullname</strong> <b class="caret caret-up"></b>
-                                        </a>
-                                    </span>
+                                    <li class="divider"></li>
+                                    <li><a tabindex="-1" href="@routes.Account.logout()">
+                                        <i class="icon-off"></i> Log Out</a></li>
+                                </ul>
+                            </span>
 
-                                <!-- Links -->
-                                    <div class="divider"></div>
-                                    <span class="header-link">
-                                        <i class="icon-user"></i>
-                                        <a href="@routes.Account.profile()">Profile</a>
-                                    </span>
-                                    <div class="divider"></div>
-                                    <span class="header-link">
-                                        <i class="icon-home"></i>
-                                        <a href="@routes.Home.feed()">Home</a>
-                                    </span>
-                                    <div class="divider"></div>
-                                    <span class="header-link">
-                                        <i class="icon-star"></i>
-                                        <a href="#">Favorites</a>
-                                    </span>
-                                    <div class="divider"></div>
-                                    <span class="header-link">
-                                        <i class="icon-off"></i>
-                                        <a href="@routes.Account.logout()">Logout</a>
-                                    </span>
-                                </div>
                         }
                     </span>
                 </div>
@@ -142,7 +129,7 @@
                     <h3 id="loginModalLabel">The proverbial high five.</h3>
                     <form action="@routes.Account.login()" method="@routes.Account.login().method">
                         <div style="color: #666" class="pad-top-med">
-                            Email
+                            Username
                         </div>
                         <div class="pad-top-low">
                         <input class="full-width" type="text" name="username"/>
@@ -300,35 +287,33 @@
             </div>
         </div>
 
-        @if(nav != "home") {
-            <div class="container" id="container">
-            <!-- Messages/alerts -->
-                @if(request.flash.get("alert").isDefined) {
-                    <div class="alert">
-                        <a class="close" data-dismiss="alert">&times;</a>
-                        <strong>Just a sec...</strong> @request.flash("alert")
-                    </div>
-                }
-                @if(request.flash.get("error").isDefined) {
-                    <div class="alert alert-error">
-                        <a class="close" data-dismiss="alert">&times;</a>
-                        <strong>Oh snap!</strong> @request.flash("error")
-                    </div>
-                }
-                @if(request.flash.get("success").isDefined) {
-                    <div class="alert alert-success">
-                        <a class="close" data-dismiss="alert">&times;</a>
-                        <strong>All right!</strong> @request.flash("success")
-                    </div>
-                }
-                @if(request.flash.get("info").isDefined) {
-                    <div class="alert alert-info">
-                        <a class="close" data-dismiss="alert">&times;</a>
-                        <strong>Heads up.</strong> @request.flash("info")
-                    </div>
-                }
-            </div>
-        }
+        <div class="container">
+        <!-- Messages/alerts -->
+            @if(request.flash.get("alert").isDefined) {
+                <div class="alert">
+                    <a class="close" data-dismiss="alert">&times;</a>
+                    <strong>Just a sec...</strong> @request.flash("alert")
+                </div>
+            }
+            @if(request.flash.get("error").isDefined) {
+                <div class="alert alert-error">
+                    <a class="close" data-dismiss="alert">&times;</a>
+                    <strong>Oh snap!</strong> @request.flash("error")
+                </div>
+            }
+            @if(request.flash.get("success").isDefined) {
+                <div class="alert alert-success">
+                    <a class="close" data-dismiss="alert">&times;</a>
+                    <strong>All right!</strong> @request.flash("success")
+                </div>
+            }
+            @if(request.flash.get("info").isDefined) {
+                <div class="alert alert-info">
+                    <a class="close" data-dismiss="alert">&times;</a>
+                    <strong>Heads up.</strong> @request.flash("info")
+                </div>
+            }
+        </div>
 
         @content
 

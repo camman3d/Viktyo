@@ -14,6 +14,7 @@ GET     /auth/signup/user               controllers.Account.signupUser
 GET     /auth/signup/organization       controllers.Account.signupOrganization
 POST    /auth/signup/user               controllers.Account.createUserAccount
 POST    /auth/signup/organization       controllers.Account.createOrganizationAccount
+POST    /auth/signup/checkUsername      controllers.Account.checkUsername
 GET     /auth/forgotPassword            controllers.Account.forgotPasswordPage
 POST    /auth/forgotPassword            controllers.Account.forgotPassword
 GET     /auth/passwordReset/:code       controllers.Account.passwordResetPage(code: String)
@@ -21,14 +22,17 @@ POST    /auth/passwordReset/:code       controllers.Account.passwordReset(code: 
 
 # Profile
 GET     /account                        controllers.Account.profile
-POST    /account/changePassword         controllers.Account.changePassword
 POST    /account/setProperty            controllers.Account.setProperty
+GET     /account/settings               controllers.Account.settings
+POST    /account/profilePicture         controllers.Account.profilePicture
 POST    /account/removeProperty         controllers.Account.removeProperty
+POST    /account/changePassword         controllers.Account.changePassword
 GET     /account/notifications          controllers.Account.notifications
 POST    /account/notifications/read     controllers.Account.readNotification
 
 # Home
 GET     /home                           controllers.Home.feed
+GET     /home/favorites                 controllers.Home.favorites
 POST    /home/add/statusUpdate          controllers.Home.addStatusUpdate
 POST    /home/add/image                 controllers.Home.addImage
 
@@ -69,6 +73,10 @@ POST    /admin/config/set               controllers.Admin.setConfiguration
 GET     /admin/users                    controllers.Admin.users
 GET     /admin/users/:id/delete         controllers.Admin.deleteUser(id: Long)
 GET     /admin/users/:id/toggleAdmin    controllers.Admin.toggleAdmin(id: Long)
+GET     /admin/pages                    controllers.Admin.pages
+GET     /admin/listings                 controllers.Admin.listings
+GET     /admin/stats                    controllers.Admin.stats
+GET     /admin/finance                  controllers.Admin.finance
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

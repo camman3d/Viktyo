@@ -1,0 +1,35 @@
+@(userSignupFields: List[(String, String, Boolean)])(implicit request: RequestHeader, user: Option[User])
+
+@main("admin", "VIKTYO - Admin Dashboard") {
+    <div class="container">
+
+        <h1>Admin Dashboard</h1>
+
+        <ul class="nav nav-tabs">
+            <li><a href="@routes.Admin.dashboard()">Info</a></li>
+            <li><a href="@routes.Admin.users()">Users</a></li>
+            <li><a href="@routes.Admin.pages()">Pages</a></li>
+            <li><a href="@routes.Admin.listings()">Listings</a></li>
+            <li><a href="@routes.Admin.stats()">Stats</a></li>
+            <li class="active"><a href="@routes.Admin.configure()">Config</a></li>
+            <li><a href="@routes.Admin.finance()">Finance</a></li>
+        </ul>
+
+        <div>
+            <h2>Configuration</h2>
+
+            <h3 class="blue">User Signup</h3>
+            <p>
+                These are the fields available when a user signs up.
+            </p>
+
+            @for(field <- userSignupFields) {
+                @views.html.admin.configureHelpers.field(field, "signup.user")
+            }
+
+            <button class="btn configSave" data-config-attr="signup.user">Save Changes</button>
+
+
+        </div>
+    </div>
+}

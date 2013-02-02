@@ -1,12 +1,12 @@
 
 // Dropdown menu positioning
-function positionDropdown() {
+/*function positionDropdown() {
     var pos = $("#header-user-image").offset();
     $("#dropdown-menu").offset({left: pos.left - 9, top: pos.top - 9});
 }
 $(window).load(function() {
     positionDropdown()
-});
+});*/
 
 // Footer positioning
 function positionFooter() {
@@ -23,7 +23,7 @@ $(window).ready(positionFooter);
 
 $(function() {
     // Set up the dropdown menu
-    positionDropdown();
+    /*positionDropdown();
     $("#dropdown-menu").hide();
     $(window).resize(function() {
         positionDropdown();
@@ -41,7 +41,7 @@ $(function() {
     });
     $('#dropdown-menu').click(function(event){
         event.stopPropagation();
-    });
+    });*/
 
     // Set up the modals
     //$("#loginModal").modal({show:false});

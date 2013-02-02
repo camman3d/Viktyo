@@ -12,9 +12,10 @@ import org.apache.commons.lang3.StringEscapeUtils
  * home.banner.titles
  * home.featured
  * ...
- * signup.availableFields
- * signup.availableFieldsTypes
- * signup.requiredFields
+ * signup.user.availableFields
+ * signup.user.availableFieldsTypes
+ * signup.user.requiredFields
+ * ...
  * profile.availableFields
  * profile.availableFieldsTypes
  * posting.types

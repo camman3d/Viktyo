@@ -1,0 +1,13 @@
+@(field: String, required: Boolean, inputType: String, validator: String)
+
+@defining(field.toLowerCase.replaceAll(" ", "_")) { fieldName =>
+    <div class="control-group">
+        <label class="control-label" for="@fieldName">@field @if(required){*}</label>
+        <div class="controls">
+            <button class="fileSelect btn">Select File</button>
+            <input type="@inputType" id="@fieldName" name="@fieldName" class="invisible @if(required){required}" data-validate="@validator">
+            <span>No file selected</span>
+            <span class="help-inline"></span>
+        </div>
+    </div>
+}

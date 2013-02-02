@@ -16,9 +16,9 @@ object Admin extends Controller {
     implicit request =>
 
     // Check that the user is logged in and is an admin
-      val user = Account.getCurrentUser
+      implicit val user = Account.getCurrentUser
       if (user.isDefined && user.get.getProperty("accountType").get == "admin") {
-        Ok // TODO: Create view
+        Ok(views.html.admin.dashboard())
 
       } else // Not authorized
         Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to view that page.")
@@ -28,10 +28,16 @@ object Admin extends Controller {
     implicit request =>
 
     // Check that the user is logged in and is an admin
-      val user = Account.getCurrentUser
+      implicit val user = Account.getCurrentUser
       if (user.isDefined && user.get.getProperty("accountType").get == "admin") {
         val configurations = ViktyoConfiguration.list
-        Ok // TODO: Create view
+
+        val userSignupRequiredFields = configurations.find(_.name == "signup.user.requiredFields").get.data.right.get
+        val userSignupFields = configurations.find(_.name == "signup.user.availableFields").get.data.right.get.zip(
+          configurations.find(_.name == "signup.user.availableFieldsTypes").get.data.right.get
+        ).map(field => (field._1, field._2, userSignupRequiredFields.contains(field._1)))
+
+        Ok(views.html.admin.configure(userSignupFields))
 
       } else // Not authorized
         Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to view that page.")
@@ -44,7 +50,7 @@ object Admin extends Controller {
       if (user.isDefined && user.get.getProperty("accountType").get == "admin") {
         val configuration = ViktyoConfiguration.findById(request.body("configuration")(0).toLong)
         configuration.get.setData(request.body("configuration")(0)).save
-        Ok // TODO: Redirect with success message
+        Redirect(routes.Admin.configure()).flashing("success" -> "Configuration saved")
 
       } else // Not authorized
         Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to view that page.")
@@ -91,5 +97,14 @@ object Admin extends Controller {
       } else // Not authorized
         Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to view that page.")
   }
+
+
+  def pages = TODO
+
+  def listings = TODO
+
+  def stats = TODO
+
+  def finance = TODO
 
 }

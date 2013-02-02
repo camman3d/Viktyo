@@ -93,12 +93,17 @@ case class User(
   }
 
   def setProperty(attribute: String, value: String): User = {
+    // Delete the old property
+    if (this.properties.find(_.attribute == attribute).isDefined)
+      removeProperty(attribute)
+
     User(this.id, this.fullname, this.username, this.password,
       this.properties.filterNot(p => p.attribute == attribute) + Property(NotAssigned, attribute, value, 0), this.objId)
   }
 
   def removeProperty(attribute: String): User = {
-    User(this.id, this.fullname, this.username, this.password, this.properties.filterNot(p => p.attribute == attribute), this.objId)
+    this.properties.find(_.attribute == attribute).get.delete()
+    User(this.id, this.fullname, this.username, this.password, this.properties.filterNot(_.attribute == attribute), this.objId)
   }
 
   def setFullname(fullname: String): User = {

@@ -152,6 +152,10 @@ object ActivityStream {
     ActivityStream(NotAssigned, new Date().getTime, user, "imagePost", image.objId, target)
   }
 
+  def createProfilePicture(user: User, image: Image): ActivityStream = {
+    ActivityStream(NotAssigned, new Date().getTime, user, "profilePicture", image.objId, user.objId)
+  }
+
   def createFavorite(user: User, posting: Posting): ActivityStream = {
     ActivityStream(NotAssigned, new Date().getTime, user, "favorite", posting.objId, posting.objId)
   }

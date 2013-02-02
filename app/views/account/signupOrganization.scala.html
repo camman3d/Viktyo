@@ -1,0 +1,33 @@
+@(availableFields: List[(String, String)], requiredFields: List[String])(implicit request: RequestHeader)
+
+@main("signup", "VIKTYO - Sign Up") {
+
+    <script src="@routes.Assets.at("javascripts/formValidator.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/checkUsername.js")" type="text/javascript"></script>
+
+    <div class="container">
+        <h1>Create an Organization Account</h1>
+
+        <form class="form-horizontal validate" action="@routes.Account.createOrganizationAccount()" method="@routes.Account.createOrganizationAccount().method">
+            @views.html.account.formHelpers.field(("Username", "text"), required = true, "javascript:checkUsername()")
+            @views.html.account.formHelpers.field(("Password", "password"), required = true)
+            @views.html.account.formHelpers.field(("Password again", "password"), required = true, "match:password")
+            @views.html.account.formHelpers.field(("Organization Name", "text"), required = true)
+
+            @for(field <- availableFields) {
+                @views.html.account.formHelpers.field(field, requiredFields.contains(field._1))
+            }
+
+            <div class="control-group">
+                <div class="controls">
+                    <button type="submit" class="btn">Create Account</button>
+                </div>
+            </div>
+        </form>
+
+        <p>
+            * means the field is required.
+        </p>
+
+    </div>
+}

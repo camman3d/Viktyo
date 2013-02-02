@@ -1,0 +1,26 @@
+@()(implicit request: RequestHeader, user: Option[User])
+
+@main("admin", "VIKTYO - Admin Dashboard") {
+    <div class="container">
+
+        <h1>Admin Dashboard</h1>
+
+        <ul class="nav nav-tabs">
+            <li><a href="@routes.Admin.dashboard()">Info</a></li>
+            <li class="active"><a href="@routes.Admin.users()">Users</a></li>
+            <li><a href="@routes.Admin.pages()">Pages</a></li>
+            <li><a href="@routes.Admin.listings()">Listings</a></li>
+            <li><a href="@routes.Admin.stats()">Stats</a></li>
+            <li><a href="@routes.Admin.configure()">Config</a></li>
+            <li><a href="@routes.Admin.finance()">Finance</a></li>
+        </ul>
+
+        <div>
+            <h2>Information</h2>
+
+            <p>
+                Important information will go here.
+            </p>
+        </div>
+    </div>
+}

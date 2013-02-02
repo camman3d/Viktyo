@@ -45,7 +45,7 @@ object Networks extends Controller {
   def addImage(id: Long) = Action(parse.multipartFormData) {
     implicit request =>
     // Check that the user is logged in
-      val user = Account.getCurrentUser
+      implicit val user = Account.getCurrentUser
       if (user.isDefined) {
 
         // Check that the network is real
@@ -57,14 +57,12 @@ object Networks extends Controller {
 
             // Handle the image upload
             val file = request.body.file("image").get
-            val id = user.get.username + "-" + Hasher.md5Hex(file.filename + new Date().getTime)
-            val uri = ImageUploader.upload(file, id, file.contentType.get)
             val name = request.body.dataParts("name")(0)
-            val image = Image(NotAssigned, name, uri).setProperty("filename", file.filename).save
+            val image = ImageUploader.uploadPicture(file, name)
 
             // Create the update
             ActivityStream.createImagePost(user.get, image, network.get.objId).save
-            Ok(uri) // TODO: Redirect with message
+            Ok(image.uri) // TODO: Redirect with message
 
           } else // Not part of network
             Ok // TODO: Redirect with message
