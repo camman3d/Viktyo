@@ -1,0 +1,90 @@
+@(targetUser: User, feed: List[ActivityStream])(implicit request: RequestHeader, user: Option[User])
+
+@main("home", "VIKTYO - Home") {
+
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/feed.css")">
+
+    <div class="container">
+        <div class="row">
+            <div class="span12">
+                <div class="feedHeader">
+                    <div class="pull-left">
+                        <div class="profile-pic-large-border inlineBlock pad-left-med">
+                        <img class="profile-pic-large" src="@targetUser.getProfilePictureUrl"/>
+                        </div>
+                        <div class="inlineBlock pad-left-med">
+                            <h3>@targetUser.fullname</h3>
+
+                            <!-- TODO: Location -->
+
+                            <!-- Followers -->
+                            <span class="pad-left-low">
+                                <i class="icon-user"></i>
+                                @targetUser.getFollower.size
+                            </span>
+
+                            <!-- Favorites -->
+                            <span class="pad-left-low">
+                                <i class="icon-star"></i>
+                                @targetUser.getFavorites.size
+                            </span>
+                        </div>
+                    </div>
+
+
+                    <div class="pull-right">
+                        @if(user.get != targetUser) {
+                            <a href="@routes.Users.follow(targetUser.id.get)" class="btn action pad-right-med pad-top-high">
+                            <img src="@routes.Assets.at("images/icons/glyphicons_006_user_add.png")"/> <br>
+                                Follow
+                            </a>
+
+                            <a href="@routes.Users.message(targetUser.id.get)" class="btn action pad-right-med pad-top-high">
+                            <img src="@routes.Assets.at("images/icons/glyphicons_010_envelope.png")"/> <br>
+                                Message
+                            </a>
+                        }
+                    </div>
+
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row pad-top-high">
+            <div class="span3">
+                <h4>About</h4>
+            </div>
+            <div class="span9">
+                <div>
+                    <div class="pull-left">
+                        <h3 class="noMargin">
+                            <img class="headerIcon" src="@routes.Assets.at("images/icons/glyphicons_054_clock.png")"/>
+                            Recent Activity
+                        </h3>
+                    </div>
+                    <div class="pull-right">
+                        <!-- TODO: Link these up with the account -->
+                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_410_facebook.png")"/>
+                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_411_twitter.png")"/>
+                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_397_linked_in.png")"/>
+                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_382_google_plus.png")"/>
+                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_402_youtube.png")"/>
+                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_412_instagram.png")"/>
+                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_380_pinterest.png")"/>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="feedContainer">
+                    @if(feed.isEmpty) {
+                        <em>No activity</em>
+                    } else {
+                        @for(activityStream <- feed) {
+                            @views.html.users.feedHelpers.render(activityStream)
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+}

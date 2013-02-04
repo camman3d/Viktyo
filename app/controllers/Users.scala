@@ -2,6 +2,7 @@ package controllers
 
 import play.api.mvc.{Action, Controller}
 import models.{ViktyoNotification, ActivityStream, User}
+import tools.FeedTools
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,16 +17,22 @@ object Users extends Controller {
     implicit request =>
 
     // Check that the user is logged in
-      val user = Account.getCurrentUser
+      implicit val user = Account.getCurrentUser
       if (user.isDefined) {
 
         // Make sure the other user exists
         val otherUser = User.findById(id)
         if (otherUser.isDefined) {
-          Ok // TODO: Create view
 
-        } else // Posting doesn't exist
-          Ok // TODO: Redirect with message
+          if (otherUser == user)
+            Redirect(routes.Home.feed())
+          else {
+            val feed = FeedTools.getFeed(otherUser.get)
+            Ok(views.html.users.feed(otherUser.get, feed))
+          }
+
+        } else // Other user doesn't exist
+          Redirect(routes.Application.index()).flashing("error" -> "User doesn't exist")
       } else // User not logged in
         Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
@@ -48,10 +55,10 @@ object Users extends Controller {
 
           // Create activity stream
           ActivityStream.createFollowUser(user.get, otherUser.get).save
-          Ok // TODO: Create view
+          Redirect(routes.Users.view(id)).flashing("success" -> ("You are now following " + otherUser.get.fullname))
 
-        } else // Posting doesn't exist
-          Ok // TODO: Redirect with message
+        } else // Other user doesn't exist
+          Redirect(routes.Application.index()).flashing("error" -> "User doesn't exist")
       } else // User not logged in
         Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }

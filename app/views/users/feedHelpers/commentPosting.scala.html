@@ -1,0 +1,6 @@
+@(user: User, posting: Posting, comment: Text)
+
+<a href="@routes.Users.view(user.id.get)">@user.fullname</a> commented on the listing <a href="@routes.Postings.view(posting.id.get)">@posting.name</a>.
+<div class="feedEntryComment">
+    @comment.textValue
+</div>

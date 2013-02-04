@@ -1,0 +1,49 @@
+.feedHeader {
+    background-image: linear-gradient(bottom, rgb(245,245,245) 100%, rgb(230,230,230) 0%);
+    background-image: -o-linear-gradient(bottom, rgb(245,245,245) 100%, rgb(230,230,230) 0%);
+    background-image: -moz-linear-gradient(bottom, rgb(245,245,245) 100%, rgb(230,230,230) 0%);
+    background-image: -webkit-linear-gradient(bottom, rgb(245,245,245) 100%, rgb(230,230,230) 0%);
+    background-image: -ms-linear-gradient(bottom, rgb(245,245,245) 100%, rgb(230,230,230) 0%);
+
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(1, rgb(245,245,245)),
+        color-stop(0, rgb(230,230,230))
+    );
+    border-bottom: 1px solid #cccccc;
+}
+
+.feedHeader .profile-pic-large-border {
+    margin-top: 10px;
+    margin-bottom: -30px;
+}
+
+.feedHeader .action {
+    width: 70px;
+    height: 55px;
+    padding-top: 20px;
+}
+
+.feedContainer {
+    background: #f9f9f9;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    padding: 20px;
+}
+
+.feedEntry {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.feedEntry:first-child {
+    padding-top: 0;
+}
+
+.feedEntry:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}

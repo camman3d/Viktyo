@@ -88,6 +88,10 @@ case class Image(
   def removeProperty(attribute: String): Image = {
     Image(this.id, this.name, this.uri, this.properties.filterNot(p => p.attribute == attribute), this.objId)
   }
+
+  // Owner property
+  def getOwner: User = User.findById(getProperty("owner").get.toLong).get
+
 }
 
 object Image {
@@ -117,4 +121,18 @@ object Image {
     }
   }
 
+  def findByObjId(id: Long): Option[Image] = {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          SELECT object.id, image. *
+          FROM object
+          JOIN image ON ( image.id = object.objId )
+          WHERE object.id = {id}
+        """
+      ).on(
+        'id -> id
+      ).as(Image.simple.singleOpt)
+    }
+  }
 }

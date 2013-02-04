@@ -1,0 +1,3 @@
+@(user: User, posting: Posting)
+
+<a href="@routes.Users.view(user.id.get)">@user.fullname</a> is now following the listing <a href="@routes.Postings.view(posting.id.get)">@posting.name</a>.

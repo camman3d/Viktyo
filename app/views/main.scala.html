@@ -67,12 +67,18 @@
                         } else {
 
                             <!-- Links when a user is logged in -->
-                            <span class="header-link pad-right-med   @active("postingsMap")">
-                                <a href="@routes.Postings.browseMap()">Listings</a>
+                                <span class="header-link pad-right-med   @active("search")">
+                                    <a href="#"><i class="icon-search iconLight-50"></i> Search</a>
+                                </span>
+                            <span class="header-link pad-right-med   @active("postingsList")">
+                                <a href="@routes.Postings.browseList()"><i class="icon-list iconLight-50"></i> Listings</a>
                             </span>
                             <span class="header-link pad-right-med   @active("organizationsList")">
-                                <a href="@routes.Organizations.browseList()">Organizations</a>
+                                <a href="@routes.Organizations.browseList()"><i class="icon-briefcase iconLight-50"></i> Organizations</a>
                             </span>
+                                <span class="header-link pad-right-med   @active("postingsMap")">
+                                    <a href="@routes.Postings.browseMap()"><i class="icon-map-marker iconLight-50"></i> Map</a>
+                                </span>
 
                             <!-- Notifications Badge -->
                             <a href="@routes.Account.notifications()">
@@ -93,7 +99,7 @@
                                 <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
                                     <li><a tabindex="-1" href="@routes.Home.feed()">
                                         <i class="icon-home"></i> Home</a></li>
-                                    <li><a tabindex="-1" href="#">
+                                    <li><a tabindex="-1" href="@routes.Home.favorites()">
                                         <i class="icon-star"></i> Favorites</a></li>
                                     <li><a tabindex="-1" href="@routes.Account.profile()">
                                         <i class="icon-user"></i> Profile</a></li>

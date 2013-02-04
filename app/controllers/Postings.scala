@@ -5,6 +5,7 @@ import models._
 import tools.{ImageUploader, Hasher}
 import java.util.Date
 import anorm.NotAssigned
+import play.api.libs.json.{JsArray, Json}
 
 /**
  * Created with IntelliJ IDEA.
@@ -66,13 +67,14 @@ object Postings extends Controller {
   def browse(view: Symbol) = Action { implicit request =>
 
   // Check that the user is logged in
-    val user = Account.getCurrentUser
+    implicit val user = Account.getCurrentUser
     if (user.isDefined) {
       val postings = Posting.list
+      val postingsJson = JsArray(postings.map(_.toJson)).toString()
       if (view == 'list)
-        Ok // TODO: Create list view
+        Ok(views.html.postings.browseList(postingsJson))
       else
-        Ok // TODO: Create map view
+        Ok(views.html.postings.browseMap(postingsJson))
 
     } else // User not logged in
       Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")

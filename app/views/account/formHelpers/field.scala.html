@@ -2,7 +2,18 @@
 
 @if(field._2 == "text" || field._2 == "password") {
     @views.html.account.formHelpers.text(field._1, required, field._2, validator)
-}
-@if(field._2 == "file") {
-    @views.html.account.formHelpers.file(field._1, required, field._2, validator)
+} else {
+    @if(field._2 == "file") {
+        @views.html.account.formHelpers.file(field._1, required, field._2, validator)
+    } else {
+        @if(field._2.substring(0,5) == "radio") {
+            @views.html.account.formHelpers.radio(field._1, required, play.api.libs.json.Json.parse(field._2.substring(5)).as[List[String]], validator)
+        }
+        @if(field._2.substring(0,6) == "select") {
+            @views.html.account.formHelpers.select(field._1, required, play.api.libs.json.Json.parse(field._2.substring(6)).as[List[String]], validator)
+        }
+        @if(field._2 == "checkbox") {
+            @views.html.account.formHelpers.checkbox(field._1, required, validator)
+        }
+    }
 }

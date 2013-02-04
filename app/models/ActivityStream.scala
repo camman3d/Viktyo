@@ -126,6 +126,22 @@ object ActivityStream {
     }
   }
 
+  def listByObject(id: Long, page: (Int, Int) = (20, 0)): List[ActivityStream] = {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          select * from activity_stream where obj = {id}
+          order by published desc
+          limit {pageSize} offset {offset}
+        """
+      ).on(
+        'id -> id,
+        'pageSize -> page._1,
+        'offset -> page._2
+      ).as(ActivityStream.simple *)
+    }
+  }
+
   def listByTarget(id: Long, page: Int = 0, pageSize: Int = 10): List[ActivityStream] = {
     val offset = page * pageSize
     DB.withConnection { implicit connection =>

@@ -1,7 +1,7 @@
 package controllers
 
 import play.api.mvc.{Action, Controller}
-import tools.{Hasher, ImageUploader, EdgeRank}
+import tools.{Hasher, ImageUploader, FeedTools}
 import models.{Network, Image, ActivityStream}
 import anorm.NotAssigned
 import java.util.Date
@@ -55,8 +55,8 @@ object Home extends Controller {
     // Check that the user is logged in
       implicit val user = Account.getCurrentUser
       if (user.isDefined) {
-        val feed = EdgeRank.getFeed(user.get)
-        Ok(views.html.home.feed(feed))
+        val feed = FeedTools.getFeed(user.get)
+        Ok(views.html.users.feed(user.get, feed))
 
       } else // User not logged in
         Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")

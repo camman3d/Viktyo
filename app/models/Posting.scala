@@ -84,7 +84,10 @@ case class Posting(
   def toJson = Json.obj(
     "id" -> this.id.get,
     "name" -> this.name,
-    "location" -> this.location.name
+    "location" -> this.location.toJson,
+    "poster" -> this.poster.toJson,
+    "coverPicture" -> this.getCoverPictureUrl,
+    "type" -> this.getProperty("postingType").get
   )
 
   def getProperty(attribute: String): Option[String] = {
@@ -108,6 +111,10 @@ case class Posting(
     Posting(this.id, this.name, this.posted, this.poster, this.location,
       this.properties.filterNot(p => p.attribute == attribute), this.objId)
   }
+
+  def getCoverPicture: Option[String] = getProperty("coverPicture")
+
+  def getCoverPictureUrl: String = getCoverPicture.getOrElse("/assets/images/postings/orange_world.jpg")
 }
 
 object Posting {
@@ -137,6 +144,23 @@ object Posting {
           """
         ).on(
           'postingType -> ViktyoObject.typeMap('posting),
+          'id -> id
+        ).as(Posting.simple.singleOpt)
+    }
+  }
+
+
+  def findByObjId(id: Long): Option[Posting] = {
+    DB.withConnection {
+      implicit connection =>
+        SQL(
+          """
+          SELECT object.id, posting. *
+          FROM object
+          JOIN posting ON ( posting.id = object.objId )
+          WHERE object.id = {id}
+          """
+        ).on(
           'id -> id
         ).as(Posting.simple.singleOpt)
     }

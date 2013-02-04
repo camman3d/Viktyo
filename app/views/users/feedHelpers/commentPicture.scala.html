@@ -1,0 +1,12 @@
+@(user: User, image: Image, owner: User, comment: Text)
+
+@if(user == owner) {
+    <!-- TODO: Create link to picture -->
+    <a href="@routes.Users.view(user.id.get)">@user.fullname</a> commented on their own <a href="#">picture</a>.
+} else {
+    <!-- TODO: Create link to picture -->
+    <a href="@routes.Users.view(user.id.get)">@user.fullname</a> commented on <a href="@routes.Users.view(owner.id.get)">@{owner.fullname}'s</a> <a href="#">picture</a>.
+}
+<div class="feedEntryComment">
+    @comment.textValue
+</div>

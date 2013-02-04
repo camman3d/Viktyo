@@ -110,4 +110,19 @@ object Text {
       ).as(Text.simple.singleOpt)
     }
   }
+
+  def findByObjId(id: Long): Option[Text] = {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          SELECT object.id, text. *
+          FROM object
+          JOIN text ON ( text.id = object.objId )
+          WHERE object.id = {id}
+        """
+      ).on(
+        'id -> id
+      ).as(Text.simple.singleOpt)
+    }
+  }
 }

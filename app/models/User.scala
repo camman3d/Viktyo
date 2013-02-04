@@ -220,6 +220,22 @@ object User {
     }
   }
 
+  def findByObjId(id: Long): Option[User] = {
+    DB.withConnection {
+      implicit connection =>
+        SQL(
+          """
+          SELECT object.id, user. *
+          FROM object
+          JOIN user ON ( user.id = object.objId )
+          WHERE object.id = {id}
+          """
+        ).on(
+          'id -> id
+        ).as(User.simple.singleOpt)
+    }
+  }
+
   def findByUsername(username: String): Option[User] = {
     DB.withConnection {
       implicit connection =>

@@ -1,0 +1,11 @@
+@(field: String, required: Boolean, validator: String)
+
+@defining(field.toLowerCase.replaceAll(" ", "_")) { fieldName =>
+    <div class="control-group">
+        <label class="control-label" for="@fieldName">@field @if(required){*}</label>
+        <div class="controls">
+            <input type="checkbox" id="@fieldName" name="@fieldName" class="@if(required){required}" data-validate="@validator">
+            <span class="help-inline"></span>
+        </div>
+    </div>
+}

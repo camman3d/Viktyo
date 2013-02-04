@@ -4,6 +4,7 @@ import anorm._
 import anorm.SqlParser._
 import play.api.db.DB
 import play.api.Play.current
+import play.api.libs.json.Json
 
 case class Location(
                      id: Pk[Long],
@@ -33,6 +34,13 @@ case class Location(
         }
     }
   }
+
+  def toJson = Json.obj(
+    "id" -> this.id.get,
+    "name" -> this.name,
+    "latitude" -> this.latitude,
+    "longitude" -> this.longitude
+  )
 
 }
 

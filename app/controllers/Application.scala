@@ -7,7 +7,7 @@ import models._
 import anorm.NotAssigned
 import java.util.Date
 import org.apache.commons.lang3.StringEscapeUtils
-import tools.{Hasher, EdgeRank, Emailer}
+import tools.{Hasher, FeedTools, Emailer}
 
 object Application extends Controller {
   
@@ -15,7 +15,7 @@ object Application extends Controller {
 
 //    Emailer.sendEmail("Josh Monson", "camman3d@gmail.com", "Test email from VIKTYO", "This is a second test.")
 //    val user = User.findById(5).get
-//    val feed = EdgeRank.getFeed(user)
+//    val feed = FeedTools.getFeed(user)
 //    val as = ActivityStream.createStatusUpdate(user, "this is my update").save
 
 

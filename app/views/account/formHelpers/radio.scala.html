@@ -1,0 +1,16 @@
+@(field: String, required: Boolean, options: List[String], validator: String)
+
+@defining(field.toLowerCase.replaceAll(" ", "_")) { fieldName =>
+    <div class="control-group">
+        <label class="control-label">@field @if(required){*}</label>
+        <div class="controls">
+            @for(option <- options) {
+                <label class="radio">
+                    <input type="radio" name="@fieldName" value="@option">
+                    @option
+                </label>
+            }
+            <span class="help-inline"></span>
+        </div>
+    </div>
+}

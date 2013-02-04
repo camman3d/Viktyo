@@ -1,0 +1,13 @@
+@(activityStream: ActivityStream)
+
+<div class="feedEntry">
+    <!-- User image -->
+    <img class="profile-pic-small" src="@activityStream.actor.getProfilePictureUrl" />
+
+    <!-- Action image -->
+    <img src="@routes.Assets.at("images/icons/" + tools.FeedTools.getIcon(activityStream))" class="pad-left-med" />
+
+    <!-- Content -->
+    @tools.FeedTools.getContent(activityStream)
+
+</div>
