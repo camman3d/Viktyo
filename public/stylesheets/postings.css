@@ -1,0 +1,42 @@
+.posting {
+    width: 33%;
+
+}
+
+.postingImage {
+    width: 100%;
+    height: 150px;
+    text-align: center;
+    border: 1px solid black;
+    overflow: hidden;
+    border-radius: 15px;
+}
+
+.postingPanoramioName {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.postingPanoramioName a {
+    font-size: 10pt;
+}
+
+.postingPanoramioAuthor {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.postingDescription p {
+    overflow: hidden;
+    /*white-space: nowrap;*/
+    text-overflow: ellipsis;
+    height: 100px;
+}
+
+.postingDescription h4 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
