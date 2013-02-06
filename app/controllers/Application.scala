@@ -1,7 +1,7 @@
 package controllers
 
 import play.api._
-import libs.json.{JsArray, Json}
+import libs.json.{JsValue, JsUndefined, JsArray, Json}
 import play.api.mvc._
 import models._
 import anorm.NotAssigned
@@ -53,8 +53,21 @@ object Application extends Controller {
   }
 
   def test = Action {
-    val p = Panoramio.getImages(40.231315, -111.659546)
-    Ok(p.toString)
+//    val p = Panoramio.getImages(40.231315, -111.659546)
+
+    val not: Option[JsValue] = None
+
+    val obj = Json.obj(
+      "something" -> 123,
+      "bool" -> true,
+      "not" -> not,
+      "yes" -> Some(
+        Json.obj(
+          "josh" -> "cool"
+        )
+      )
+    )
+    Ok(obj.toString)
   }
   
 }

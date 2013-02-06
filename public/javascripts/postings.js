@@ -2,14 +2,14 @@ var postingRenderer = {
     renderPanoramio: function renderPanoramio(posting) {
         var data = {
             title: posting.name,
-            content: "", // TODO
-            link: "/postings/" + posting.id,
+            content: posting.description,
+            link: "/posting/" + posting.id,
             imageSrc: posting.panoramio.photo_file_url,
             poster: posting.poster.fullname,
             posterLink: "/users/" + posting.poster.id,
-            followers: 0, // TODO
-            favorites: 0, // TODO
-            views: 0, // TODO
+            followers: posting.followers,
+            favorites: posting.favorites,
+            views: posting.views,
             panoramioImageUrl: posting.panoramio.photo_url,
             panoramioImageName: posting.panoramio.photo_title,
             panoramioAuthorUrl: posting.panoramio.owner_url,
@@ -21,14 +21,14 @@ var postingRenderer = {
     renderStandard: function renderStandard(posting) {
         var data = {
             title: posting.name,
-            content: "", // TODO
-            link: "/postings/" + posting.id,
+            content: posting.description,
+            link: "/posting/" + posting.id,
             imageSrc: posting.coverPicture,
             poster: posting.poster.fullname,
             posterLink: "/users/" + posting.poster.id,
-            followers: 0, // TODO
-            favorites: 0, // TODO
-            views: 0 // TODO
+            followers: posting.followers,
+            favorites: posting.favorites,
+            views: posting.views
         };
         var html = Mustache.to_html(postingTemplates.standard, data);
         $("#postings").append(html);

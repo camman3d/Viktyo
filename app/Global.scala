@@ -2,7 +2,7 @@ import anorm.NotAssigned
 import java.util.Date
 import models.{Location, Posting, User, ViktyoConfiguration}
 import play.api._
-import tools.Hasher
+import tools.{Panoramio, Hasher}
 
 object Global extends GlobalSettings {
   override def onStart(app: Application) {
@@ -60,16 +60,31 @@ object Global extends GlobalSettings {
 
       // Create the postings
       val time = new Date().getTime
-      Posting(NotAssigned, "Internship in Provo", time, org1, Location(NotAssigned, "Provo, UT, USA", 40.231315, -111.659546)).setProperty("postingType", "internship").save
-      Posting(NotAssigned, "Internship in New York", time, org2, Location(NotAssigned, "New York, NY, USA", 40.713956, -74.025879)).setProperty("postingType", "internship").save
-      Posting(NotAssigned, "Internship in Cairo", time, org3, Location(NotAssigned, "Cairo, Egypt", 30.145127, 31.201172)).setProperty("postingType", "internship").save
-      Posting(NotAssigned, "Job in Paris", time, org4, Location(NotAssigned, "Paris, France", 48.864715, 2.373047)).setProperty("postingType", "job").save
-      Posting(NotAssigned, "Job in London", time, org5, Location(NotAssigned, "London, UK", 51.522416, -0.131836)).setProperty("postingType", "job").save
-      Posting(NotAssigned, "Study Abroad in Madrid", time, org6, Location(NotAssigned, "Madrid, Spain", 40.446947, -3.713379)).setProperty("postingType", "study_abroad").save
-      Posting(NotAssigned, "Study Abroad in Istanbul", time, org7, Location(NotAssigned, "Istanbul, Turkey", 41.004775, 28.981934)).setProperty("postingType", "study_abroad").save
-      Posting(NotAssigned, "Volunteer in Tokyo", time, org8, Location(NotAssigned, "Tokyo, Japan", 35.684072, 139.691162)).setProperty("postingType", "volunteer").save
-      Posting(NotAssigned, "Volunteer in Sydney", time, org9, Location(NotAssigned, "Sydney, Australia", -33.870416, 151.171875)).setProperty("postingType", "volunteer").save
-      Posting(NotAssigned, "Volunteer in Moscow", time, org10, Location(NotAssigned, "Moscow, Russia", 55.776573, 37.529297)).setProperty("postingType", "volunteer").save
+      Posting(NotAssigned, "Internship in Provo", time, org1, Location(NotAssigned, "Provo, UT, USA", 40.231315, -111.659546))
+        .setProperty("postingType", "internship")
+        .setProperty("panoramio", Panoramio.getImages(40.231315, -111.659546, 0, 1)(0).toString()).save
+      Posting(NotAssigned, "Internship in New York", time, org2, Location(NotAssigned, "New York, NY, USA", 40.713956, -74.025879))
+        .setProperty("postingType", "internship")
+        .setProperty("panoramio", Panoramio.getImages(40.713956, -74.025879, 0, 1)(0).toString()).save
+      Posting(NotAssigned, "Internship in Cairo", time, org3, Location(NotAssigned, "Cairo, Egypt", 30.145127, 31.201172))
+        .setProperty("postingType", "internship")
+        .setProperty("panoramio", Panoramio.getImages(30.145127, 31.201172, 0, 1)(0).toString()).save
+      Posting(NotAssigned, "Job in Paris", time, org4, Location(NotAssigned, "Paris, France", 48.864715, 2.373047))
+        .setProperty("postingType", "job")
+        .setProperty("panoramio", Panoramio.getImages(48.864715, 2.373047, 0, 1)(0).toString()).save
+      Posting(NotAssigned, "Job in London", time, org5, Location(NotAssigned, "London, UK", 51.522416, -0.131836))
+        .setProperty("postingType", "job")
+        .setProperty("panoramio", Panoramio.getImages(51.522416, -0.131836, 0, 1)(0).toString()).save
+      Posting(NotAssigned, "Study Abroad in Madrid", time, org6, Location(NotAssigned, "Madrid, Spain", 40.446947, -3.713379))
+        .setProperty("postingType", "study_abroad").save
+      Posting(NotAssigned, "Study Abroad in Istanbul", time, org7, Location(NotAssigned, "Istanbul, Turkey", 41.004775, 28.981934))
+        .setProperty("postingType", "study_abroad").save
+      Posting(NotAssigned, "Volunteer in Tokyo", time, org8, Location(NotAssigned, "Tokyo, Japan", 35.684072, 139.691162))
+        .setProperty("postingType", "volunteer").save
+      Posting(NotAssigned, "Volunteer in Sydney", time, org9, Location(NotAssigned, "Sydney, Australia", -33.870416, 151.171875))
+        .setProperty("postingType", "volunteer").save
+      Posting(NotAssigned, "Volunteer in Moscow", time, org10, Location(NotAssigned, "Moscow, Russia", 55.776573, 37.529297))
+        .setProperty("postingType", "volunteer").save
 
     }
   }

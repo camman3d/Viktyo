@@ -6,6 +6,7 @@ import play.api.Play.current
 import anorm.SqlParser._
 import anorm.~
 import play.api.libs.json.{JsUndefined, JsValue, Json}
+import org.apache.commons.lang3.StringUtils
 
 case class Posting(
                     id: Pk[Long],
@@ -88,7 +89,11 @@ case class Posting(
     "poster" -> this.poster.toJson,
     "coverPicture" -> this.getCoverPictureUrl,
     "type" -> this.getProperty("postingType").get,
-    "panoramio" -> this.getPanoramio
+    "panoramio" -> this.getPanoramio,
+    "description" -> this.getDescription,
+    "followers" -> this.getFollowers.size,
+    "favorites" -> this.getFavorites,
+    "views" -> this.getViews
   )
 
   def getProperty(attribute: String): Option[String] = {
@@ -118,6 +123,23 @@ case class Posting(
   def getCoverPictureUrl: String = getCoverPicture.getOrElse("/assets/images/postings/orange_world.jpg")
 
   def getPanoramio: Option[JsValue] = getProperty("panoramio").map(Json.parse(_))
+
+  def getFollowers: List[User] =
+    getProperty("followers").map(_.split(",").map(u => User.findById(u.toLong).get).toList).getOrElse(List())
+
+  def getFavorites = getFavoriters.size
+
+  def getFavoriters: List[User] =
+    getProperty("favoriters").map(_.split(",").map(u => User.findById(u.toLong).get).toList).getOrElse(List())
+
+  def getViews: Int = getProperty("views").map(_.toInt).getOrElse(0)
+
+  def incrementViews: Posting = this.setProperty("views", (getViews + 1).toString)
+
+  def getDescription: String = getProperty("description").getOrElse("No description has been written yet.")
+
+  def getType: String = StringUtils.capitalize(getProperty("postingType").get.replaceAll("_", " "))
+
 }
 
 object Posting {

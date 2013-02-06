@@ -159,16 +159,19 @@ object Postings extends Controller {
   def view(id: Long) = Action { implicit request =>
 
   // Check that the user is logged in
-    val user = Account.getCurrentUser
+    implicit val user = Account.getCurrentUser
     if (user.isDefined) {
 
       // Make sure the posting exists
       val posting = Posting.findById(id)
       if (posting.isDefined) {
-        Ok // TODO: Create view
+
+        // Increment the views
+        val updatedPosting = posting.get.incrementViews.save
+        Ok(views.html.postings.view(updatedPosting))
 
       } else // Posting doesn't exist
-        Ok // TODO: Redirect with message
+        Redirect(routes.Application.index()).flashing("error" -> "The listing doesn't exist")
     } else // User not logged in
       Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
