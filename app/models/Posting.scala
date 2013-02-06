@@ -5,7 +5,7 @@ import play.api.db.DB
 import play.api.Play.current
 import anorm.SqlParser._
 import anorm.~
-import play.api.libs.json.Json
+import play.api.libs.json.{JsUndefined, JsValue, Json}
 
 case class Posting(
                     id: Pk[Long],
@@ -87,7 +87,8 @@ case class Posting(
     "location" -> this.location.toJson,
     "poster" -> this.poster.toJson,
     "coverPicture" -> this.getCoverPictureUrl,
-    "type" -> this.getProperty("postingType").get
+    "type" -> this.getProperty("postingType").get,
+    "panoramio" -> this.getPanoramio
   )
 
   def getProperty(attribute: String): Option[String] = {
@@ -115,6 +116,8 @@ case class Posting(
   def getCoverPicture: Option[String] = getProperty("coverPicture")
 
   def getCoverPictureUrl: String = getCoverPicture.getOrElse("/assets/images/postings/orange_world.jpg")
+
+  def getPanoramio: Option[JsValue] = getProperty("panoramio").map(Json.parse(_))
 }
 
 object Posting {

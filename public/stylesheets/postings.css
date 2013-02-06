@@ -1,7 +1,6 @@
 .posting {
     width: 33%;
     float: left;
-    padding: 3px;
 }
 
 .postingImageContainer {
@@ -10,6 +9,7 @@
     background: #EEE;
     overflow: hidden;
     height: 150px;
+    margin: 4px 4px 0;
     box-shadow: 0 0 7px rgba(0,0,0,0.2);
     -moz-box-shadow: 0 0 7px rgba(0,0,0,0.2);
     -webkit-box-shadow: 0 0 7px rgba(0,0,0,0.2);
@@ -19,6 +19,12 @@
     -o-transition: height ease 0.5s;
     -ms-transition: height ease 0.5s;
     -webkit-transition: height ease 0.5s;
+}
+
+.posting:hover .postingImageContainer {
+    box-shadow: 0 0 7px rgba(0,0,0,0.4);
+    -moz-box-shadow: 0 0 7px rgba(0,0,0,0.4);
+    -webkit-box-shadow: 0 0 7px rgba(0,0,0,0.4);
 }
 
 .posting.panoramio:hover .postingImageContainer {

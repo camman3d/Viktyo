@@ -7,7 +7,7 @@ import models._
 import anorm.NotAssigned
 import java.util.Date
 import org.apache.commons.lang3.StringEscapeUtils
-import tools.{Hasher, FeedTools, Emailer}
+import tools.{Panoramio, Hasher, FeedTools, Emailer}
 
 object Application extends Controller {
   
@@ -50,6 +50,11 @@ object Application extends Controller {
 //    } catch {
 //      case _ => BadRequest(Json.obj("success" -> false))
 //    }
+  }
+
+  def test = Action {
+    val p = Panoramio.getImages(40.231315, -111.659546)
+    Ok(p.toString)
   }
   
 }
