@@ -15,4 +15,13 @@
     color: white;
     text-shadow: 1px 1px 4px rgba(0,0,0,1);
     font-size: 16pt;
+    background: rgba(0,0,0,0.4);
+    padding: 6px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+.postingCommentTime {
+    font-size: 9pt;
 }

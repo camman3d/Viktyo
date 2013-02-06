@@ -30,7 +30,7 @@ object Postings extends Controller {
             // Create the comment
             val comment = request.body("comment")(0)
             ActivityStream.createComment(user.get, comment, posting.get.objId).save
-            Ok // TODO: Redirect with message
+            Redirect(routes.Postings.view(id)).flashing("success" -> "Comment added.")
 
         } else // Network doesn't exist
           Ok // TODO: Redirect with message
@@ -108,7 +108,7 @@ object Postings extends Controller {
         Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def favorite(id: Long) = Action(parse.multipartFormData) {
+  def favorite(id: Long) = Action {
     implicit request =>
 
       // Check that the user is logged in
@@ -121,10 +121,11 @@ object Postings extends Controller {
 
           // Favorite it
           user.get.addFavorite(posting.get).save
+          // TODO: Add to posting favoriters
 
           // Create the update
           ActivityStream.createFavorite(user.get, posting.get).save
-          Ok // TODO: Redirect with message
+          Redirect(routes.Postings.view(id)).flashing("success" -> "This listing is now part of your favorites.")
 
         } else // Network doesn't exist
           Ok // TODO: Redirect with message
@@ -132,7 +133,7 @@ object Postings extends Controller {
         Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def unfavorite(id: Long) = Action(parse.multipartFormData) {
+  def unfavorite(id: Long) = Action {
     implicit request =>
 
       // Check that the user is logged in
@@ -148,7 +149,7 @@ object Postings extends Controller {
 
           // Delete from activity stream
           ActivityStream.find(user.get, "favorite", posting.get.objId, posting.get.objId).get.delete()
-          Ok // TODO: Redirect with message
+          Redirect(routes.Postings.view(id)).flashing("success" -> "This listing is no longer part of your favorites.")
 
         } else // Network doesn't exist
           Ok // TODO: Redirect with message
@@ -166,9 +167,19 @@ object Postings extends Controller {
       val posting = Posting.findById(id)
       if (posting.isDefined) {
 
+        // Get the images
+        val images = ActivityStream.listByTarget(posting.get.objId).filter(_.verb == "imagePost").map(a =>
+          (a, Image.findByObjId(a.obj).get)
+        )
+
+        // Get the comments
+        val comments = ActivityStream.listByTarget(posting.get.objId).filter(_.verb == "comment").map(a =>
+          (a, Text.findByObjId(a.obj).get)
+        )
+
         // Increment the views
         val updatedPosting = posting.get.incrementViews.save
-        Ok(views.html.postings.view(updatedPosting))
+        Ok(views.html.postings.view(updatedPosting, images, comments))
 
       } else // Posting doesn't exist
         Redirect(routes.Application.index()).flashing("error" -> "The listing doesn't exist")

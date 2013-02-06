@@ -16,7 +16,8 @@ object ApplicationBuild extends Build {
     "org.apache.commons" % "commons-io" % "1.3.2",
     "org.codemonkey.simplejavamail" % "simple-java-mail" % "2.1",
     "com.amazonaws" % "aws-java-sdk" % "1.0.002",
-    "gov.nih.imagej" % "imagej" % "1.46"
+    "gov.nih.imagej" % "imagej" % "1.46",
+    "joda-time" % "joda-time" % "2.1"
   )
 
 

@@ -91,8 +91,8 @@ case class Posting(
     "type" -> this.getProperty("postingType").get,
     "panoramio" -> this.getPanoramio,
     "description" -> this.getDescription,
-    "followers" -> this.getFollowers.size,
-    "favorites" -> this.getFavorites,
+    "followers" -> this.countFavorites,
+    "favorites" -> this.countFavorites,
     "views" -> this.getViews
   )
 
@@ -124,10 +124,12 @@ case class Posting(
 
   def getPanoramio: Option[JsValue] = getProperty("panoramio").map(Json.parse(_))
 
+  def countFollowers = getProperty("followers").map(_.split(",")).size
+
   def getFollowers: List[User] =
     getProperty("followers").map(_.split(",").map(u => User.findById(u.toLong).get).toList).getOrElse(List())
 
-  def getFavorites = getFavoriters.size
+  def countFavorites = getProperty("favoriters").map(_.split(",")).size
 
   def getFavoriters: List[User] =
     getProperty("favoriters").map(_.split(",").map(u => User.findById(u.toLong).get).toList).getOrElse(List())

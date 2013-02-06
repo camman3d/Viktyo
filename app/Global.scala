@@ -76,15 +76,20 @@ object Global extends GlobalSettings {
         .setProperty("postingType", "job")
         .setProperty("panoramio", Panoramio.getImages(51.522416, -0.131836, 0, 1)(0).toString()).save
       Posting(NotAssigned, "Study Abroad in Madrid", time, org6, Location(NotAssigned, "Madrid, Spain", 40.446947, -3.713379))
-        .setProperty("postingType", "study_abroad").save
+        .setProperty("postingType", "study_abroad")
+        .setProperty("panoramio", Panoramio.getImages(40.446947, -3.713379, 0, 1)(0).toString()).save
       Posting(NotAssigned, "Study Abroad in Istanbul", time, org7, Location(NotAssigned, "Istanbul, Turkey", 41.004775, 28.981934))
-        .setProperty("postingType", "study_abroad").save
+        .setProperty("postingType", "study_abroad")
+        .setProperty("panoramio", Panoramio.getImages(41.004775, 28.981934, 0, 1)(0).toString()).save
       Posting(NotAssigned, "Volunteer in Tokyo", time, org8, Location(NotAssigned, "Tokyo, Japan", 35.684072, 139.691162))
-        .setProperty("postingType", "volunteer").save
+        .setProperty("postingType", "volunteer")
+        .setProperty("panoramio", Panoramio.getImages(35.684072, 139.691162, 0, 1)(0).toString()).save
       Posting(NotAssigned, "Volunteer in Sydney", time, org9, Location(NotAssigned, "Sydney, Australia", -33.870416, 151.171875))
-        .setProperty("postingType", "volunteer").save
+        .setProperty("postingType", "volunteer")
+        .setProperty("panoramio", Panoramio.getImages(-33.870416, 151.171875, 0, 1)(0).toString()).save
       Posting(NotAssigned, "Volunteer in Moscow", time, org10, Location(NotAssigned, "Moscow, Russia", 55.776573, 37.529297))
-        .setProperty("postingType", "volunteer").save
+        .setProperty("postingType", "volunteer")
+        .setProperty("panoramio", Panoramio.getImages(55.776573, 37.529297, 0, 1)(0).toString()).save
 
     }
   }
