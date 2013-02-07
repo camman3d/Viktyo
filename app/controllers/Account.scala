@@ -242,7 +242,7 @@ object Account extends Controller {
     implicit request =>
       implicit user =>
         val notifications = ViktyoNotification.listByUser(user.id.get)
-        Ok // TODO: Redirect with message
+        Ok(notifications.toString()) // TODO: Redirect with message
   }
 
   def readNotification = AuthenticatedAction {

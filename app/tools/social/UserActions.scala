@@ -27,4 +27,12 @@ object UserActions {
     user.setProperty("profilePicture", image.uri).save
     ActivityStream.generate.users.profilePicture(user, image).save
   }
+
+  def userPostsStatusUpdate(user: User, statusUpdate: String) {
+    ActivityStream.generate.general.statusUpdate(user, statusUpdate, user.objId).save
+  }
+
+  def userPostsImage(user: User, image: Image) {
+    ActivityStream.generate.general.imagePost(user, image, user.objId).save
+  }
 }

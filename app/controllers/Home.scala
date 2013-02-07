@@ -5,6 +5,7 @@ import tools.{Hasher, ImageUploader, FeedTools}
 import models.{Network, Image, ActivityStream}
 import anorm.NotAssigned
 import java.util.Date
+import tools.social.UserActions
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,7 +22,7 @@ object Home extends Controller {
 
       // Create the status update
         val statusUpdate = request.body.asFormUrlEncoded.get("statusUpdate")(0)
-        ActivityStream.createStatusUpdate(user, statusUpdate, user.objId).save
+        UserActions.userPostsStatusUpdate(user, statusUpdate)
         Ok // TODO: Redirect with message
   }
 
@@ -35,7 +36,7 @@ object Home extends Controller {
         val image = ImageUploader.uploadPicture(file, name)
 
         // Create the update
-        ActivityStream.createImagePost(user, image, user.objId).save
+        UserActions.userPostsImage(user, image)
         Ok(image.uri) // TODO: Redirect with message
   }
 
