@@ -114,8 +114,8 @@ object ViktyoNotification {
     }
   }
 
-  def createFollowing(follower: User, following: User): ViktyoNotification =
-    ViktyoNotification(NotAssigned, following.id.get, -1, 'following, Map("follower" -> follower.id.get.toString),
+  def createFollowing(follower: User, followee: User): ViktyoNotification =
+    ViktyoNotification(NotAssigned, followee.id.get, -1, 'following, Map("follower" -> follower.id.get.toString),
       new Date().getTime, false)
 
   def createMessage(sender: User, receiver: User, message: String): ViktyoNotification =

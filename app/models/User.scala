@@ -124,12 +124,8 @@ case class User(
 
   // Generic Property List functions
 
-  def getPropertyList(attribute: String): List[Long] = {
-    if (this.getProperty(attribute).isDefined)
-      this.getProperty(attribute).get.split(",").map(s => s.toLong).toList
-    else
-      List()
-  }
+  def getPropertyList(attribute: String): List[Long] =
+    this.getProperty(attribute).map(_.split(",").map(s => s.toLong).toList).getOrElse(List())
 
   def addToPropertyList(attribute: String, value: Long): User = {
     if (this.getProperty(attribute).isDefined)
@@ -171,7 +167,7 @@ case class User(
 
   def hasFavorite(posting: Posting): Boolean = hasInPropertyList("favorites", posting.id.get)
 
-  // Following functions
+  // Following functions (I am following these people)
   def getFollowing: List[User] = getPropertyList("following").map(n => User.findById(n).get)
 
   def addFollowing(user: User): User = addToPropertyList("following", user.id.get)
@@ -180,7 +176,7 @@ case class User(
 
   def hasFollowing(user: User): Boolean = hasInPropertyList("following", user.id.get)
 
-  // Follower functions
+  // Follower functions (These people are following me)
   def getFollower: List[User] = getPropertyList("followers").map(n => User.findById(n).get)
 
   def addFollower(user: User): User = addToPropertyList("followers", user.id.get)

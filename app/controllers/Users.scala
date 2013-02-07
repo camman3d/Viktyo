@@ -1,8 +1,9 @@
 package controllers
 
-import play.api.mvc.{Action, Controller}
+import play.api.mvc._
 import models.{ViktyoNotification, ActivityStream, User}
 import tools.FeedTools
+import tools.social.UserActions
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,120 +14,62 @@ import tools.FeedTools
  */
 object Users extends Controller {
 
-  def view(id: Long) = Action {
+  def AuthenticatedUserAction(id: Long)(f: Request[AnyContent] => (User => (User => Result))) = {
+    Account.AuthenticatedAction {
+      request =>
+        user =>
+          val otherUser = User.findById(id)
+          if (otherUser.isDefined)
+            f(request)(user)(otherUser.get)
+          else
+            Redirect(routes.Postings.browseList()).flashing("alert" -> "That user doesn't exist.")
+    }
+  }
+
+  def view(id: Long) = AuthenticatedUserAction(id) {
     implicit request =>
-
-    // Check that the user is logged in
-      implicit val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Make sure the other user exists
-        val otherUser = User.findById(id)
-        if (otherUser.isDefined) {
+      implicit user =>
+        otherUser =>
 
           if (otherUser == user)
             Redirect(routes.Home.feed())
           else {
-            val feed = FeedTools.getFeed(otherUser.get)
-            Ok(views.html.users.feed(otherUser.get, feed))
+            val feed = FeedTools.getFeed(otherUser)
+            Ok(views.html.users.feed(otherUser, feed))
           }
-
-        } else // Other user doesn't exist
-          Redirect(routes.Application.index()).flashing("error" -> "User doesn't exist")
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def follow(id: Long) = Action {
+  def follow(id: Long) = AuthenticatedUserAction(id) {
     implicit request =>
-
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Make sure the other user exists
-        val otherUser = User.findById(id)
-        if (otherUser.isDefined) {
-          user.get.addFollowing(otherUser.get).save
-          otherUser.get.addFollower(user.get).save
-
-          // Add notification
-          ViktyoNotification.createFollowing(user.get, otherUser.get).save
-
-          // Create activity stream
-          ActivityStream.createFollowUser(user.get, otherUser.get).save
-          Redirect(routes.Users.view(id)).flashing("success" -> ("You are now following " + otherUser.get.fullname))
-
-        } else // Other user doesn't exist
-          Redirect(routes.Application.index()).flashing("error" -> "User doesn't exist")
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+      implicit user =>
+        otherUser =>
+          UserActions.userFollows(user, otherUser)
+          Redirect(routes.Users.view(id)).flashing("info" -> ("You are now following " + otherUser.fullname))
   }
 
-  def unfollow(id: Long) = Action {
+  def unfollow(id: Long) = AuthenticatedUserAction(id) {
     implicit request =>
+      implicit user =>
+        otherUser =>
+          UserActions.userUnfollows(user, otherUser)
+          Redirect(routes.Users.view(id)).flashing("info" -> ("You are no longer following " + otherUser.fullname))
+  }
 
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Make sure the other user exists
-        val otherUser = User.findById(id)
-        if (otherUser.isDefined) {
-          user.get.removeFollowing(otherUser.get).save
-          otherUser.get.removeFollower(user.get).save
-
-          // Delete activity stream
-          ActivityStream.find(user.get, "follow", otherUser.get.objId, user.get.objId).get.delete()
+  def message(id: Long) = AuthenticatedUserAction(id) {
+    implicit request =>
+      implicit user =>
+        otherUser =>
           Ok // TODO: Create view
-
-        } else // Posting doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def message(id: Long) = Action {
+  def sendMessage(id: Long) = AuthenticatedUserAction(id) {
     implicit request =>
-
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Make sure the other user exists
-        val otherUser = User.findById(id)
-        if (otherUser.isDefined) {
-          Ok // TODO: Create view
-
-        } else // Posting doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
-  }
-
-  def sendMessage(id: Long) = Action(parse.urlFormEncoded) {
-    implicit request =>
-
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Make sure the other user exists
-        val otherUser = User.findById(id)
-        if (otherUser.isDefined) {
-
+      implicit user =>
+        otherUser =>
           // Create the message
-          val message = request.body("message")(0)
-          ViktyoNotification.createMessage(user.get, otherUser.get, message).save
-
-          // Create activity stream
-          ActivityStream.createFollowUser(user.get, otherUser.get).save
-          Ok // TODO: Redirect with message
-
-        } else // Posting doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+          val message = request.body.asFormUrlEncoded.get("message")(0)
+          ViktyoNotification.createMessage(user, otherUser, message).save
+          Redirect(routes.Users.view(id)).flashing("info" -> "Message sent")
   }
 
 }

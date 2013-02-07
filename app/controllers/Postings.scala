@@ -2,195 +2,204 @@ package controllers
 
 import play.api.mvc._
 import models._
-import tools.{ImageUploader, Hasher}
-import java.util.Date
-import anorm.NotAssigned
-import play.api.libs.json.{JsArray, Json}
+import tools.ImageUploader
 import tools.social.PostingActions
-import play.api.libs.json.JsArray
+import play.api.libs.json.{Json, JsArray}
+import anorm.NotAssigned
+import java.util.Date
 
-/**
- * Created with IntelliJ IDEA.
- * User: Josh
- * Date: 1/24/13
- * Time: 3:12 PM
- * To change this template use File | Settings | File Templates.
- */
 object Postings extends Controller {
 
-
-
-  def addComment(id: Long) = Action(parse.urlFormEncoded) {
-    implicit request =>
-
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Check that the posting is real
-        val posting = Posting.findById(id)
-        if (posting.isDefined) {
-
-          // Create the comment
-          val comment = request.body("comment")(0)
-          PostingActions.userComments(user.get, comment, posting.get)
-
-          Redirect(routes.Postings.view(id)).flashing("success" -> "Comment added.")
-
-        } else // Network doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+  def AuthenticatedPostingAction(id: Long)(f: Request[AnyContent] => (User => (Posting => Result))) = {
+    Account.AuthenticatedAction {
+      request =>
+        user =>
+          val posting = Posting.findById(id)
+          if (posting.isDefined)
+            f(request)(user)(posting.get)
+          else
+            Redirect(routes.Postings.browseList()).flashing("alert" -> "That listing doesn't exist.")
+    }
   }
 
-  def addImage(id: Long) = Action(parse.multipartFormData) {
+  def addComment(id: Long) = AuthenticatedPostingAction(id) {
     implicit request =>
-    // Check that the user is logged in
-      implicit val user = Account.getCurrentUser
-      if (user.isDefined) {
+      implicit user =>
+        posting =>
 
-        // Check that the posting is real
-        val posting = Posting.findById(id)
-        if (posting.isDefined) {
+          // Create the comment
+          val comment = request.body.asFormUrlEncoded.get("comment")(0)
+          PostingActions.userComments(user, comment, posting)
+          Redirect(routes.Postings.view(id)).flashing("info" -> "Comment added.")
+  }
+
+  def addImage(id: Long) = AuthenticatedPostingAction(id) {
+    implicit request =>
+      implicit user =>
+        posting =>
 
           // Handle the image upload
-          val file = request.body.file("image").get
-          val name = request.body.dataParts("name")(0)
+          val file = request.body.asMultipartFormData.get.file("image").get
+          val name = request.body.asMultipartFormData.get.dataParts("name")(0)
           val image = ImageUploader.uploadPicture(file, name)
 
           // Create the update
-          PostingActions.userPostsImage(user.get, image, posting.get)
-          Ok(image.uri) // TODO: Redirect with message
-
-        } else // Network doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+          PostingActions.userPostsImage(user, image, posting)
+          Redirect(routes.Postings.view(id)).flashing("info" -> "Image added.")
   }
 
-  def browse(view: Symbol) = Action {
+  def browse(view: Symbol) = Account.AuthenticatedAction {
     implicit request =>
+      implicit user =>
 
-    // Check that the user is logged in
-      implicit val user = Account.getCurrentUser
-      if (user.isDefined) {
+        // Get all the postings
         val postings = Posting.list
         val postingsJson = JsArray(postings.map(_.toJson)).toString()
         if (view == 'list)
           Ok(views.html.postings.browseList(postingsJson))
         else
           Ok(views.html.postings.browseMap(postingsJson))
-
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
   def browseList = browse('list)
 
   def browseMap = browse('map)
 
-  def deleteActivityStream(postId: Long, id: Long) = Action(parse.urlFormEncoded) {
+  def deleteActivityStream(postId: Long, id: Long) = AuthenticatedPostingAction(postId) {
     implicit request =>
-
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Check that the posting is real
-        val posting = Posting.findById(postId)
-        if (posting.isDefined) {
+      implicit user =>
+        posting =>
 
           // Check that the comment is real and the user made the comment
           val comment = ActivityStream.findById(id)
-          if (comment.isDefined && comment.get.actor == user.get) {
+          if (comment.isDefined && comment.get.actor == user) {
             comment.get.delete()
-            Ok // TODO: Redirect with message
-
-          } else // Can't delete
-            Ok // TODO: Redirect with message
-        } else // Network doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+            Redirect(routes.Postings.view(postId)).flashing("info" -> "Item removed")
+          } else
+            Redirect(routes.Postings.view(postId)).flashing("alert" -> "You cannot remove that item")
   }
 
-  def favorite(id: Long) = Action {
+  def favorite(id: Long) = AuthenticatedPostingAction(id) {
     implicit request =>
-
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Check that the posting is real
-        val posting = Posting.findById(id)
-        if (posting.isDefined) {
+      implicit user =>
+        posting =>
 
           // Favorite it
-          user.get.addFavorite(posting.get).save
-          // TODO: Add to posting favoriters
-
-          // Create the update
-          ActivityStream.createFavorite(user.get, posting.get).save
-          Redirect(routes.Postings.view(id)).flashing("success" -> "This listing is now part of your favorites.")
-
-        } else // Network doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+          PostingActions.userFavorites(user, posting)
+          Redirect(routes.Postings.view(id)).flashing("info" -> "This listing is now part of your favorites.")
   }
 
-  def unfavorite(id: Long) = Action {
+  def unfavorite(id: Long) = AuthenticatedPostingAction(id) {
     implicit request =>
-
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Check that the posting is real
-        val posting = Posting.findById(id)
-        if (posting.isDefined) {
+      implicit user =>
+        posting =>
 
           // Unfavorite it
-          user.get.removeFavorite(posting.get).save
-
-          // Delete from activity stream
-          ActivityStream.find(user.get, "favorite", posting.get.objId, posting.get.objId).get.delete()
-          Redirect(routes.Postings.view(id)).flashing("success" -> "This listing is no longer part of your favorites.")
-
-        } else // Network doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+          PostingActions.userUnfavorites(user, posting)
+          Redirect(routes.Postings.view(id)).flashing("info" -> "This listing is no longer part of your favorites.")
   }
 
-  def view(id: Long) = Action {
+  def follow(id: Long) = AuthenticatedPostingAction(id) {
     implicit request =>
+      implicit user =>
+        posting =>
 
-    // Check that the user is logged in
-      implicit val user = Account.getCurrentUser
-      if (user.isDefined) {
+          // Follow it
+          PostingActions.userFollows(user, posting)
+          Redirect(routes.Postings.view(id)).flashing("info" -> "You are now following this listing.")
+  }
 
-        // Make sure the posting exists
-        val posting = Posting.findById(id)
-        if (posting.isDefined) {
+  def unfollow(id: Long) = AuthenticatedPostingAction(id) {
+    implicit request =>
+      implicit user =>
+        posting =>
+
+          // Unfollow it
+          PostingActions.userUnfollows(user, posting)
+          Redirect(routes.Postings.view(id)).flashing("info" -> "You are no longer following this listing.")
+  }
+
+  def view(id: Long) = AuthenticatedPostingAction(id) {
+    implicit request =>
+      implicit user =>
+        posting =>
 
           // Get the images
-          val images = ActivityStream.listByTarget(posting.get.objId).filter(_.verb == "imagePost").map(a =>
+          val images = ActivityStream.listByTarget(posting.objId).filter(_.verb == "imagePost").map(a =>
             (a, Image.findByObjId(a.obj).get)
           )
 
           // Get the comments
-          val comments = ActivityStream.listByTarget(posting.get.objId).filter(_.verb == "comment").map(a =>
+          val comments = ActivityStream.listByTarget(posting.objId).filter(_.verb == "comment").map(a =>
             (a, Text.findByObjId(a.obj).get)
           )
 
           // Increment the views
-          val updatedPosting = posting.get.incrementViews.save
+          val updatedPosting = posting.incrementViews.save
           Ok(views.html.postings.view(updatedPosting, images, comments))
+  }
 
-        } else // Posting doesn't exist
-          Redirect(routes.Application.index()).flashing("error" -> "The listing doesn't exist")
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+  def create = Account.AuthenticatedAction {
+    implicit request =>
+      implicit user =>
+
+        // Make sure the user is an organization or admin
+        val accountType = user.getProperty("accountType")
+        if (accountType == "organization" || accountType == "admin") {
+          val posting = Posting.createFromRequest.save
+          PostingActions.orgCreates(user, posting)
+          Redirect(routes.Postings.view(posting.id.get)).flashing("success" -> "Listing created")
+        } else
+          Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to create listings.")
+  }
+
+  def setPanoramio(id: Long) = AuthenticatedPostingAction(id) {
+    implicit request =>
+      implicit user =>
+        posting =>
+
+      // Make sure the user is an organization or admin
+        val accountType = user.getProperty("accountType")
+        if (accountType == "organization" || accountType == "admin") {
+
+          // Make sure the organization owns the posting
+          if (posting.poster == user) {
+            val panoramio = request.body.asFormUrlEncoded.get("panoramio")(0)
+            posting.setProperty("panoramio", panoramio)
+            val uri = (Json.parse(panoramio) \ "photo_file_url").as[String]
+            val image = Image(NotAssigned, posting.name, uri).setProperty("owner", user.id.get.toString)
+              .setProperty("added", new Date().getTime.toString).save
+            PostingActions.orgUpdatesCover(user, posting, image)
+
+            Redirect(routes.Postings.view(posting.id.get)).flashing("info" -> "Listing cover image updated")
+          } else
+            Redirect(routes.Postings.view(id)).flashing("alert" -> "You are not authorized to edit this listing.")
+        } else
+          Redirect(routes.Postings.view(id)).flashing("alert" -> "You are not authorized to edit listings.")
+  }
+
+  def setCover(id: Long) = AuthenticatedPostingAction(id) {
+    implicit request =>
+      implicit user =>
+        posting =>
+
+        // Make sure the user is an organization or admin
+          val accountType = user.getProperty("accountType")
+          if (accountType == "organization" || accountType == "admin") {
+
+            // Make sure the organization owns the posting
+            if (posting.poster == user) {
+
+              // Handle the image upload
+              val file = request.body.asMultipartFormData.get.file("image").get
+              val name = request.body.asMultipartFormData.get.dataParts("name")(0)
+              val image = ImageUploader.uploadPicture(file, name)
+              PostingActions.orgUpdatesCover(user, posting, image)
+
+              Redirect(routes.Postings.view(posting.id.get)).flashing("info" -> "Listing cover image updated")
+            } else
+              Redirect(routes.Postings.view(id)).flashing("alert" -> "You are not authorized to edit this listing.")
+          } else
+            Redirect(routes.Postings.view(id)).flashing("alert" -> "You are not authorized to edit listings.")
   }
 }

@@ -1,6 +1,6 @@
-@(postings: String)(implicit request: RequestHeader, user: Option[User] = None)
+@(postings: String)(implicit request: RequestHeader, user: User)
 
-@main("postingsList", "VIKTYO - Listings") {
+@main("postingsList", "VIKTYO - Listings", Some(user)) {
 
     <script src="@routes.Assets.at("javascripts/mustache.js")" type="text/javascript"></script>
     <script src="@routes.Assets.at("javascripts/postingTemplates.js")" type="text/javascript"></script>

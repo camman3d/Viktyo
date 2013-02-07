@@ -9,6 +9,7 @@ import play.api.libs.json.Json
 import scala.Some
 import scala.Some
 import scala.Some
+import tools.social.UserActions
 
 /**
  * The Account controller is responsible for all actions relating to the account not including social network functions.
@@ -233,10 +234,7 @@ object Account extends Controller {
         val image = ImageUploader.uploadProfilePicture(file, name)
 
         // Set the profile picture
-        user.setProperty("profilePicture", image.uri).save
-
-        // Create the update
-        ActivityStream.createProfilePicture(user, image).save
+        UserActions.userSetProfilePicture(user, image)
         Redirect(routes.Account.settings()).flashing("success" -> "Your profile picture was changed.")
   }
 

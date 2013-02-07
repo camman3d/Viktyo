@@ -60,7 +60,7 @@ object ImageUploader {
       ""
   }
 
-  def uploadPicture(file: FilePart[TemporaryFile], name: String)(implicit user: Option[User]): Image = {
+  def uploadPicture(file: FilePart[TemporaryFile], name: String)(implicit user: User): Image = {
     // Set up to process the image
     val ij = IJ.openImage(file.ref.file.getAbsolutePath)
     var imageProcessor = ij.getProcessor
@@ -71,7 +71,7 @@ object ImageUploader {
     imageProcessor = imageProcessor.resize(newWidth)
 
     val bufferedImage = imageProcessor.getBufferedImage
-    val id = user.get.username + "-" + Hasher.md5Hex(file.filename + new Date().getTime)
+    val id = user.username + "-" + Hasher.md5Hex(file.filename + new Date().getTime)
     val extension = FilenameUtils.getExtension(file.filename)
     val filename = id + "." + extension
     val output = new ByteArrayOutputStream()
@@ -85,7 +85,7 @@ object ImageUploader {
     Image(NotAssigned, name, uri).setProperty("filename", file.filename).save
   }
 
-  def uploadProfilePicture(file: FilePart[TemporaryFile], name: String)(implicit user: Option[User]): Image = {
+  def uploadProfilePicture(file: FilePart[TemporaryFile], name: String)(implicit user: User): Image = {
     // Set up to process the image
     val ij = IJ.openImage(file.ref.file.getAbsolutePath)
     var imageProcessor = ij.getProcessor
@@ -105,7 +105,7 @@ object ImageUploader {
     imageProcessor = imageProcessor.crop()
 
     val bufferedImage = imageProcessor.getBufferedImage
-    val id = user.get.username + "-" + Hasher.md5Hex(file.filename + new Date().getTime)
+    val id = user.username + "-" + Hasher.md5Hex(file.filename + new Date().getTime)
     val extension = FilenameUtils.getExtension(file.filename)
     val filename = id + "." + extension
     val output = new ByteArrayOutputStream()

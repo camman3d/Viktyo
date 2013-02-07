@@ -5,8 +5,10 @@ import play.api.db.DB
 import play.api.Play.current
 import anorm.SqlParser._
 import anorm.~
-import play.api.libs.json.{JsUndefined, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import org.apache.commons.lang3.StringUtils
+import play.api.mvc.{Request, AnyContent}
+import java.util.Date
 
 case class Posting(
                     id: Pk[Long],
@@ -124,21 +126,70 @@ case class Posting(
 
   def getPanoramio: Option[JsValue] = getProperty("panoramio").map(Json.parse(_))
 
-  def countFollowers = getProperty("followers").map(_.split(",")).size
+  // Generic Property List functions
 
-  def getFollowers: List[User] =
-    getProperty("followers").map(_.split(",").map(u => User.findById(u.toLong).get).toList).getOrElse(List())
+  def getPropertyList(attribute: String): List[Long] =
+    this.getProperty(attribute).map(_.split(",").map(s => s.toLong).toList).getOrElse(List())
 
-  def countFavorites = getProperty("favoriters").map(_.split(",")).size
+  def addToPropertyList(attribute: String, value: Long): Posting = {
+    if (this.getProperty(attribute).isDefined)
+      this.setProperty(attribute, this.getProperty(attribute).get + "," + value)
+    else
+      this.setProperty(attribute, value.toString)
+  }
 
-  def getFavoriters: List[User] =
-    getProperty("favoriters").map(_.split(",").map(u => User.findById(u.toLong).get).toList).getOrElse(List())
+  def removeFromPropertyList(attribute: String, value: Long): Posting = {
+    if (this.getProperty(attribute).isDefined)
+      this.setProperty(attribute,
+        this.getProperty(attribute).get.split(",").filterNot(p => p == value.toString).mkString(","))
+    else
+      this
+  }
+
+  def hasInPropertyList(attribute: String, value: Long): Boolean = {
+    if (this.getProperty(attribute).isDefined)
+      this.getProperty(attribute).get.split(",").map(n => n.toLong).filter(l => l == value).size > 0
+    else
+      false
+  }
+
+  def countPropertyList(attribute: String): Int = getProperty(attribute).map(_.split(",")).size
+
+  // Followers
+
+  def getFollowers: List[User] = getPropertyList("followers").map(n => User.findById(n).get)
+
+  def addFollower(user: User): Posting = addToPropertyList("followers", user.id.get)
+
+  def removeFollower(user: User): Posting = removeFromPropertyList("followers", user.id.get)
+
+  def hasFollower(user: User): Boolean = hasInPropertyList("followers", user.id.get)
+
+  def countFollowers = countPropertyList("followers")
+
+  // Favorites
+
+  def getFavorites: List[User] = getPropertyList("favorites").map(n => User.findById(n).get)
+
+  def addFavorite(user: User): Posting = addToPropertyList("favorites", user.id.get)
+
+  def removeFavorite(user: User): Posting = removeFromPropertyList("favorites", user.id.get)
+
+  def hasFavorite(user: User): Boolean = hasInPropertyList("favorites", user.id.get)
+
+  def countFavorites = countPropertyList("favorites")
+
+  // Views
 
   def getViews: Int = getProperty("views").map(_.toInt).getOrElse(0)
 
   def incrementViews: Posting = this.setProperty("views", (getViews + 1).toString)
 
+  // Description
+
   def getDescription: String = getProperty("description").getOrElse("No description has been written yet.")
+
+  // Type
 
   def getType: String = StringUtils.capitalize(getProperty("postingType").get.replaceAll("_", " "))
 
@@ -245,6 +296,19 @@ object Posting {
           'search -> ("%" + searchString + "%")
         ).as(Posting.simple *)
     }
+  }
+
+  def createFromRequest()(implicit request: Request[AnyContent], poster: User): Posting = {
+    val params = request.body.asFormUrlEncoded.get
+    val name = params("name")(0)
+    val posted = new Date().getTime
+    val locationName = params("location")(0)
+    val latitude = params("latitude")(0).toDouble
+    val longitude = params("longitude")(0).toDouble
+    val location = Location(NotAssigned, locationName, latitude, longitude)
+    val postingType = params("postingType")(0)
+
+    Posting(NotAssigned, name, posted, poster, location).setProperty("postingType", postingType)
   }
 
 }

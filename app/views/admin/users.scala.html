@@ -1,6 +1,6 @@
-@()(implicit request: RequestHeader, user: Option[User])
+@()(implicit request: RequestHeader, user: User)
 
-@main("admin", "VIKTYO - Admin Dashboard") {
+@main("admin", "VIKTYO - Admin Dashboard", Some(user)) {
     <div class="container">
 
         <h1>Admin Dashboard</h1>

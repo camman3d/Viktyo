@@ -1,6 +1,6 @@
-@()(implicit request: RequestHeader, user: Option[User])
+@()(implicit request: RequestHeader, user: User)
 
-@main("profile", "VIKTYO - Profile") {
+@main("profile", "VIKTYO - Profile", Some(user)) {
 
     <script src="@routes.Assets.at("javascripts/formValidator.js")" type="text/javascript"></script>
     <script src="@routes.Assets.at("javascripts/fileUpload.js")" type="text/javascript"></script>

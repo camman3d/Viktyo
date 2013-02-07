@@ -1,18 +1,12 @@
 package controllers
 
 import play.api.mvc._
-import models.{User, Image, ActivityStream, Network}
-import tools.{ImageUploader, Hasher}
-import java.util.Date
-import anorm.NotAssigned
+import models.{ActivityStream, User, Network}
+import tools.ImageUploader
 import tools.social.NetworkActions
 
 /**
- * Created with IntelliJ IDEA.
- * User: Josh
- * Date: 1/24/13
- * Time: 2:44 PM
- * To change this template use File | Settings | File Templates.
+ * Controller for network actions
  */
 object Networks extends Controller {
 
@@ -39,10 +33,10 @@ object Networks extends Controller {
             // Create the status update
             val statusUpdate = request.body.asFormUrlEncoded.get("statusUpdate")(0)
             NetworkActions.userPostsStatusUpdate(user, statusUpdate, network)
-            Ok // TODO: Redirect with message
+            Redirect(routes.Networks.networkFeed(id)).flashing("info" -> "Status updated")
 
           } else // Not part of network
-            Ok // TODO: Redirect with message
+            Redirect(routes.Home.feed()).flashing("alert" -> "You are not part of that network.")
   }
 
   def addImage(id: Long) = AuthenticatedNetworkAction(id) {
@@ -60,10 +54,23 @@ object Networks extends Controller {
 
             // Create the update
             NetworkActions.userPostsImage(user, image, network)
-            Ok(image.uri) // TODO: Redirect with message
+            Redirect(routes.Networks.networkFeed(id)).flashing("info" -> "Image added")
 
           } else // Not part of network
-            Ok // TODO: Redirect with message
+            Redirect(routes.Home.feed()).flashing("alert" -> "You are not part of that network.")
+  }
+
+  def removeActivityStream(networkId: Long, id: Long) = AuthenticatedNetworkAction(networkId) {
+    implicit request =>
+      implicit user =>
+        network =>
+
+          val activityStream = ActivityStream.findById(id)
+          if(activityStream.isDefined) {
+            activityStream.get.delete()
+            Redirect(routes.Networks.networkFeed(networkId)).flashing("info" -> "Item removed")
+          } else
+            Redirect(routes.Networks.networkFeed(networkId)).flashing("alert" -> "You cannot remove that item")
   }
 
   def browse = Account.AuthenticatedAction {
@@ -78,6 +85,7 @@ object Networks extends Controller {
     implicit request =>
       implicit user =>
         network =>
+          // TODO: Get network feed
           Ok // TODO: Create view
   }
 
@@ -101,7 +109,7 @@ object Networks extends Controller {
     implicit request =>
       implicit user =>
         network =>
-          // Check that the user is an organization
+        // Check that the user is an organization
           if (user.getProperty("accountType") == "organization") {
             val members = network.getMembers
             Ok // TODO: Redirect with message

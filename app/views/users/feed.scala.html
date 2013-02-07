@@ -1,6 +1,6 @@
-@(targetUser: User, feed: List[ActivityStream])(implicit request: RequestHeader, user: Option[User])
+@(targetUser: User, feed: List[ActivityStream])(implicit request: RequestHeader, user: User)
 
-@main("home", "VIKTYO - Home") {
+@main("home", "VIKTYO - Home", Some(user)) {
 
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/feed.css")">
 
@@ -33,7 +33,7 @@
 
 
                     <div class="pull-right">
-                        @if(user.get != targetUser) {
+                        @if(user != targetUser) {
                             <a href="@routes.Users.follow(targetUser.id.get)" class="btn action pad-right-med pad-top-high">
                             <img src="@routes.Assets.at("images/icons/glyphicons_006_user_add.png")"/> <br>
                                 Follow

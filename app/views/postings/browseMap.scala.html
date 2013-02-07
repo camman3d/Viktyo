@@ -1,6 +1,6 @@
-@(postings: String)(implicit request: RequestHeader, user: Option[User] = None)
+@(postings: String)(implicit request: RequestHeader, user: User)
 
-@main("postingsMap", "VIKTYO - Listings") {
+@main("postingsMap", "VIKTYO - Listings", Some(user)) {
     @postings
 
 }
