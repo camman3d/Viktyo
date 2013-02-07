@@ -1,11 +1,13 @@
 package controllers
 
-import play.api.mvc.{RequestHeader, Action, Controller}
+import play.api.mvc._
 import models._
 import anorm.NotAssigned
 import tools.{ImageUploader, Hasher}
 import java.util.Date
 import play.api.libs.json.Json
+import scala.Some
+import scala.Some
 import scala.Some
 
 /**
@@ -177,99 +179,89 @@ object Account extends Controller {
         Redirect(routes.Application.index()).flashing("alert" -> "That's a bad email reset code.")
   }
 
-  def profile = Action {
+  def profile = AuthenticatedAction {
     implicit request =>
-    // Check that the user is logged in
-      implicit val user = getCurrentUser
-      if (user.isDefined) {
+      implicit user =>
         Ok(views.html.account.profile())
-      } else // Not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def settings = Action {
+  def settings = AuthenticatedAction {
     implicit request =>
-    // Check that the user is logged in
-      implicit val user = getCurrentUser
-      if (user.isDefined) {
+      implicit user =>
         Ok(views.html.account.settings())
-      } else // Not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def changePassword = Action(parse.urlFormEncoded) {
+  def changePassword = AuthenticatedAction {
     implicit request =>
-
-    // Check that the user is logged in
-      implicit val user = getCurrentUser
-      if (user.isDefined) {
-        val password = request.body("password")(0)
-        user.get.setPassword(Hasher.sha256Base64(password)).save
+      implicit user =>
+        val password = request.body.asFormUrlEncoded.get("password")(0)
+        user.setPassword(Hasher.sha256Base64(password)).save
         Redirect(routes.Account.settings()).flashing("success" -> "Your password was changed.")
-      } else // Not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def setProperty() = Action(parse.urlFormEncoded) {
+  def setProperty() = AuthenticatedAction {
     implicit request =>
-
-    // Check that the user is logged in
-      implicit val user = getCurrentUser
-      if (user.isDefined) {
-        val attribute = request.body("attribute")(0)
-        val value = request.body("value")(0)
+      implicit user =>
+        val attribute = request.body.asFormUrlEncoded.get("attribute")(0)
+        val value = request.body.asFormUrlEncoded.get("value")(0)
 
         // Check if we're setting one of the user attributes
         if (attribute == "fullname")
-          user.get.setFullname(value).save
+          user.setFullname(value).save
         else if (attribute == "username")
-          user.get.setUsername(value).save
+          user.setUsername(value).save
         else
-          user.get.setProperty(attribute, value).save
+          user.setProperty(attribute, value).save
         Ok // TODO: Redirect with message
-
-      } else // Not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def removeProperty() = Action(parse.urlFormEncoded) {
+  def removeProperty() = AuthenticatedAction {
     implicit request =>
-
-    // Check that the user is logged in
-      implicit val user = getCurrentUser
-      if (user.isDefined) {
-        val attribute = request.body("attribute")(0)
-        user.get.removeProperty(attribute).save
+      implicit user =>
+        val attribute = request.body.asFormUrlEncoded.get("attribute")(0)
+        user.removeProperty(attribute).save
         Ok // TODO: Redirect with message
-
-      } else // Not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def profilePicture = Action(parse.multipartFormData) {
+  def profilePicture = AuthenticatedAction {
     implicit request =>
+      implicit user =>
 
-      // Check that the user is logged in
-      implicit val user = getCurrentUser
-      if (user.isDefined) {
-
-        // Handle the image upload
-        val file = request.body.file("image").get
+      // Handle the image upload
+        val file = request.body.asMultipartFormData.get.file("image").get
         val name = "Profile Picture"
         val image = ImageUploader.uploadProfilePicture(file, name)
 
         // Set the profile picture
-        user.get.setProperty("profilePicture", image.uri).save
+        user.setProperty("profilePicture", image.uri).save
 
         // Create the update
-        ActivityStream.createProfilePicture(user.get, image).save
+        ActivityStream.createProfilePicture(user, image).save
         Redirect(routes.Account.settings()).flashing("success" -> "Your profile picture was changed.")
-
-      } else // Not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  // Non action functions
+  def notifications = AuthenticatedAction {
+    implicit request =>
+      implicit user =>
+        val notifications = ViktyoNotification.listByUser(user.id.get)
+        Ok // TODO: Redirect with message
+  }
+
+  def readNotification = AuthenticatedAction {
+    implicit request =>
+      implicit user =>
+
+      // Check that the notification he is reading is real and his
+        val notification = ViktyoNotification.findById(request.body.asFormUrlEncoded.get("notification")(0).toLong)
+        if (notification.isDefined && notification.get.user == user.id.get) {
+          notification.get.markRead.save
+          Ok // TODO: Redirect with message
+
+        } else
+          Ok // TODO: Redirect with message
+  }
+
+  // Authentication helpers
   def getCurrentUser()(implicit request: RequestHeader): Option[User] = {
     if (request.session.get("username").isDefined)
       User.findByUsername(request.session("username"))
@@ -277,35 +269,14 @@ object Account extends Controller {
       None
   }
 
-  def notifications = Action {
-    implicit request =>
-    // Check that the user is logged in
-      implicit val user = getCurrentUser
-      if (user.isDefined) {
-
-        val notifications = ViktyoNotification.listByUser(user.get.id.get)
-        Ok // TODO: Redirect with message
-
-      } else // Not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
-  }
-
-  def readNotification = Action(parse.urlFormEncoded) {
-    implicit request =>
-
-    // Check that the user is logged in
-      implicit val user = getCurrentUser
-      if (user.isDefined) {
-
-        // Check that the notification he is reading is real and his
-        val notification = ViktyoNotification.findById(request.body("notification")(0).toLong)
-        if (notification.isDefined && notification.get.user == user.get.id.get) {
-          notification.get.markRead.save
-          Ok // TODO: Redirect with message
-
-        } else
-          Ok // TODO: Redirect with message
-      } else // Not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+  def AuthenticatedAction(f: Request[AnyContent] => (User => Result)) = {
+    Action {
+      implicit request =>
+        val user = getCurrentUser
+        if (user.isDefined) {
+          f(request)(user.get)
+        } else // User not logged in
+          Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+    }
   }
 }

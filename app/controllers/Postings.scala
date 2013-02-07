@@ -1,11 +1,13 @@
 package controllers
 
-import play.api.mvc.{Action, Controller}
+import play.api.mvc._
 import models._
 import tools.{ImageUploader, Hasher}
 import java.util.Date
 import anorm.NotAssigned
 import play.api.libs.json.{JsArray, Json}
+import tools.social.PostingActions
+import play.api.libs.json.JsArray
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,6 +17,8 @@ import play.api.libs.json.{JsArray, Json}
  * To change this template use File | Settings | File Templates.
  */
 object Postings extends Controller {
+
+
 
   def addComment(id: Long) = Action(parse.urlFormEncoded) {
     implicit request =>
@@ -27,10 +31,11 @@ object Postings extends Controller {
         val posting = Posting.findById(id)
         if (posting.isDefined) {
 
-            // Create the comment
-            val comment = request.body("comment")(0)
-            ActivityStream.createComment(user.get, comment, posting.get.objId).save
-            Redirect(routes.Postings.view(id)).flashing("success" -> "Comment added.")
+          // Create the comment
+          val comment = request.body("comment")(0)
+          PostingActions.userComments(user.get, comment, posting.get)
+
+          Redirect(routes.Postings.view(id)).flashing("success" -> "Comment added.")
 
         } else // Network doesn't exist
           Ok // TODO: Redirect with message
@@ -51,12 +56,11 @@ object Postings extends Controller {
           // Handle the image upload
           val file = request.body.file("image").get
           val name = request.body.dataParts("name")(0)
+          val image = ImageUploader.uploadPicture(file, name)
 
-            val image = ImageUploader.uploadPicture(file, name)
-
-            // Create the update
-            ActivityStream.createImagePost(user.get, image, posting.get.objId).save
-            Ok(image.uri) // TODO: Redirect with message
+          // Create the update
+          PostingActions.userPostsImage(user.get, image, posting.get)
+          Ok(image.uri) // TODO: Redirect with message
 
         } else // Network doesn't exist
           Ok // TODO: Redirect with message
@@ -64,29 +68,31 @@ object Postings extends Controller {
         Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def browse(view: Symbol) = Action { implicit request =>
+  def browse(view: Symbol) = Action {
+    implicit request =>
 
-  // Check that the user is logged in
-    implicit val user = Account.getCurrentUser
-    if (user.isDefined) {
-      val postings = Posting.list
-      val postingsJson = JsArray(postings.map(_.toJson)).toString()
-      if (view == 'list)
-        Ok(views.html.postings.browseList(postingsJson))
-      else
-        Ok(views.html.postings.browseMap(postingsJson))
+    // Check that the user is logged in
+      implicit val user = Account.getCurrentUser
+      if (user.isDefined) {
+        val postings = Posting.list
+        val postingsJson = JsArray(postings.map(_.toJson)).toString()
+        if (view == 'list)
+          Ok(views.html.postings.browseList(postingsJson))
+        else
+          Ok(views.html.postings.browseMap(postingsJson))
 
-    } else // User not logged in
-      Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+      } else // User not logged in
+        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
   def browseList = browse('list)
+
   def browseMap = browse('map)
 
   def deleteActivityStream(postId: Long, id: Long) = Action(parse.urlFormEncoded) {
     implicit request =>
 
-      // Check that the user is logged in
+    // Check that the user is logged in
       val user = Account.getCurrentUser
       if (user.isDefined) {
 
@@ -96,7 +102,7 @@ object Postings extends Controller {
 
           // Check that the comment is real and the user made the comment
           val comment = ActivityStream.findById(id)
-          if(comment.isDefined && comment.get.actor == user.get) {
+          if (comment.isDefined && comment.get.actor == user.get) {
             comment.get.delete()
             Ok // TODO: Redirect with message
 
@@ -111,7 +117,7 @@ object Postings extends Controller {
   def favorite(id: Long) = Action {
     implicit request =>
 
-      // Check that the user is logged in
+    // Check that the user is logged in
       val user = Account.getCurrentUser
       if (user.isDefined) {
 
@@ -136,7 +142,7 @@ object Postings extends Controller {
   def unfavorite(id: Long) = Action {
     implicit request =>
 
-      // Check that the user is logged in
+    // Check that the user is logged in
       val user = Account.getCurrentUser
       if (user.isDefined) {
 
@@ -157,33 +163,34 @@ object Postings extends Controller {
         Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def view(id: Long) = Action { implicit request =>
+  def view(id: Long) = Action {
+    implicit request =>
 
-  // Check that the user is logged in
-    implicit val user = Account.getCurrentUser
-    if (user.isDefined) {
+    // Check that the user is logged in
+      implicit val user = Account.getCurrentUser
+      if (user.isDefined) {
 
-      // Make sure the posting exists
-      val posting = Posting.findById(id)
-      if (posting.isDefined) {
+        // Make sure the posting exists
+        val posting = Posting.findById(id)
+        if (posting.isDefined) {
 
-        // Get the images
-        val images = ActivityStream.listByTarget(posting.get.objId).filter(_.verb == "imagePost").map(a =>
-          (a, Image.findByObjId(a.obj).get)
-        )
+          // Get the images
+          val images = ActivityStream.listByTarget(posting.get.objId).filter(_.verb == "imagePost").map(a =>
+            (a, Image.findByObjId(a.obj).get)
+          )
 
-        // Get the comments
-        val comments = ActivityStream.listByTarget(posting.get.objId).filter(_.verb == "comment").map(a =>
-          (a, Text.findByObjId(a.obj).get)
-        )
+          // Get the comments
+          val comments = ActivityStream.listByTarget(posting.get.objId).filter(_.verb == "comment").map(a =>
+            (a, Text.findByObjId(a.obj).get)
+          )
 
-        // Increment the views
-        val updatedPosting = posting.get.incrementViews.save
-        Ok(views.html.postings.view(updatedPosting, images, comments))
+          // Increment the views
+          val updatedPosting = posting.get.incrementViews.save
+          Ok(views.html.postings.view(updatedPosting, images, comments))
 
-      } else // Posting doesn't exist
-        Redirect(routes.Application.index()).flashing("error" -> "The listing doesn't exist")
-    } else // User not logged in
-      Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+        } else // Posting doesn't exist
+          Redirect(routes.Application.index()).flashing("error" -> "The listing doesn't exist")
+      } else // User not logged in
+        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 }

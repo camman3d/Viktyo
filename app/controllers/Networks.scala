@@ -1,10 +1,11 @@
 package controllers
 
-import play.api.mvc.{Action, Controller}
+import play.api.mvc._
 import models.{User, Image, ActivityStream, Network}
 import tools.{ImageUploader, Hasher}
 import java.util.Date
 import anorm.NotAssigned
+import tools.social.NetworkActions
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,152 +16,97 @@ import anorm.NotAssigned
  */
 object Networks extends Controller {
 
-  def addStatusUpdate(id: Long) = Action(parse.urlFormEncoded) {
+  def AuthenticatedNetworkAction(id: Long)(f: Request[AnyContent] => (User => (Network => Result))) = {
+    Account.AuthenticatedAction {
+      implicit request =>
+        user =>
+          val network = Network.findById(id)
+          if (network.isDefined)
+            f(request)(user)(network.get)
+          else
+            Redirect(routes.Networks.browse()).flashing("alert" -> "That network doesn't exist")
+    }
+  }
+
+  def addStatusUpdate(id: Long) = AuthenticatedNetworkAction(id) {
     implicit request =>
+      implicit user =>
+        network =>
 
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Check that the network is real
-        val network = Network.findById(id)
-        if (network.isDefined) {
-
-          // Make sure the user is part of the network
-          if (user.get.hasNetwork(network.get)) {
+        // Make sure the user is part of the network
+          if (user.hasNetwork(network)) {
 
             // Create the status update
-            val statusUpdate = request.body("statusUpdate")(0)
-            ActivityStream.createStatusUpdate(user.get, statusUpdate, network.get.objId).save
+            val statusUpdate = request.body.asFormUrlEncoded.get("statusUpdate")(0)
+            NetworkActions.userPostsStatusUpdate(user, statusUpdate, network)
             Ok // TODO: Redirect with message
 
           } else // Not part of network
             Ok // TODO: Redirect with message
-        } else // Network doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def addImage(id: Long) = Action(parse.multipartFormData) {
+  def addImage(id: Long) = AuthenticatedNetworkAction(id) {
     implicit request =>
-    // Check that the user is logged in
-      implicit val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Check that the network is real
-        val network = Network.findById(id)
-        if (network.isDefined) {
+      implicit user =>
+        network =>
 
           // Make sure the user is part of the network
-          if (user.get.hasNetwork(network.get)) {
+          if (user.hasNetwork(network)) {
 
             // Handle the image upload
-            val file = request.body.file("image").get
-            val name = request.body.dataParts("name")(0)
+            val file = request.body.asMultipartFormData.get.file("image").get
+            val name = request.body.asMultipartFormData.get.dataParts("name")(0)
             val image = ImageUploader.uploadPicture(file, name)
 
             // Create the update
-            ActivityStream.createImagePost(user.get, image, network.get.objId).save
+            NetworkActions.userPostsImage(user, image, network)
             Ok(image.uri) // TODO: Redirect with message
 
           } else // Not part of network
             Ok // TODO: Redirect with message
-        } else // Network doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def browse = Action {
+  def browse = Account.AuthenticatedAction {
     implicit request =>
-
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
+      implicit user =>
         val page: Int = request.queryString.get("page").getOrElse(Seq("0"))(0).toInt
         val networks = Network.list(page)
         Ok // TODO: Create view
-
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def networkFeed(id: Long) = Action {
+  def networkFeed(id: Long) = AuthenticatedNetworkAction(id) {
     implicit request =>
-
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Check that the network is real
-        val network = Network.findById(id)
-        if (network.isDefined) {
+      implicit user =>
+        network =>
           Ok // TODO: Create view
-
-        } else // Network doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def joinNetwork(id: Long) = Action {
+  def joinNetwork(id: Long) = AuthenticatedNetworkAction(id) {
     implicit request =>
-
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Check that the network is real
-        val network = Network.findById(id)
-        if (network.isDefined) {
-          user.get.addNetwork(network.get).save
-          network.get.addMember(user.get).save
+      implicit user =>
+        network =>
+          NetworkActions.userJoins(user, network)
           Ok // TODO: Redirect with message
-
-        } else // Network doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def leaveNetwork(id: Long) = Action {
+  def leaveNetwork(id: Long) = AuthenticatedNetworkAction(id) {
     implicit request =>
-
-    // Check that the user is logged in
-      val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Check that the network is real
-        val network = Network.findById(id)
-        if (network.isDefined) {
-          user.get.removeNetwork(network.get).save
-          network.get.removeMember(user.get).save
+      implicit user =>
+        network =>
+          NetworkActions.userLeaves(user, network)
           Ok // TODO: Redirect with message
-
-        } else // Network doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def viewMembers(id: Long) = Action {
+  def viewMembers(id: Long) = AuthenticatedNetworkAction(id) {
     implicit request =>
-
-      // Check that the user is logged in and is an organization
-      val user = Account.getCurrentUser
-      if (user.isDefined && user.get.getProperty("accountType") == "organization") {
-
-        // Check that the network is real
-        val network = Network.findById(id)
-        if (network.isDefined) {
-          val members = network.get.getMembers
-          Ok // TODO: Redirect with message
-
-        } else // Network doesn't exist
-          Ok // TODO: Redirect with message
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+      implicit user =>
+        network =>
+          // Check that the user is an organization
+          if (user.getProperty("accountType") == "organization") {
+            val members = network.getMembers
+            Ok // TODO: Redirect with message
+          } else // User not logged in
+            Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to view the members.")
   }
 
 }

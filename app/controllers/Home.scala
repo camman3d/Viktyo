@@ -15,63 +15,41 @@ import java.util.Date
  */
 object Home extends Controller {
 
-  def addStatusUpdate() = Action(parse.urlFormEncoded) {
+  def addStatusUpdate() = Account.AuthenticatedAction {
     implicit request =>
+      implicit user =>
 
-      // Check that the user is logged in
-      implicit val user = Account.getCurrentUser
-      if (user.isDefined) {
-
-        // Create the status update
-        val statusUpdate = request.body("statusUpdate")(0)
-        ActivityStream.createStatusUpdate(user.get, statusUpdate, user.get.objId).save
+      // Create the status update
+        val statusUpdate = request.body.asFormUrlEncoded.get("statusUpdate")(0)
+        ActivityStream.createStatusUpdate(user, statusUpdate, user.objId).save
         Ok // TODO: Redirect with message
-
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 
-  def addImage() = Action(parse.multipartFormData) { implicit request =>
-    // Check that the user is logged in
-    implicit val user = Account.getCurrentUser
-    if (user.isDefined) {
+  def addImage() = Account.AuthenticatedAction {
+    implicit request =>
+      implicit user =>
 
       // Handle the image upload
-      val file = request.body.file("image").get
-      val name = request.body.dataParts("name")(0)
-      val image = ImageUploader.uploadPicture(file, name)
+        val file = request.body.asMultipartFormData.get.file("image").get
+        val name = request.body.asMultipartFormData.get.dataParts("name")(0)
+        val image = ImageUploader.uploadPicture(file, name)
 
-      // Create the update
-      ActivityStream.createImagePost(user.get, image, user.get.objId).save
-      Ok(image.uri) // TODO: Redirect with message
-
-    } else // User not logged in
-      Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+        // Create the update
+        ActivityStream.createImagePost(user, image, user.objId).save
+        Ok(image.uri) // TODO: Redirect with message
   }
 
-  def feed = Action {
+  def feed = Account.AuthenticatedAction {
     implicit request =>
-
-    // Check that the user is logged in
-      implicit val user = Account.getCurrentUser
-      if (user.isDefined) {
-        val feed = FeedTools.getFeed(user.get)
-        Ok(views.html.users.feed(user.get, feed))
-
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+      implicit user =>
+        val feed = FeedTools.getFeed(user)
+        Ok(views.html.users.feed(user, feed))
   }
 
-  def favorites = Action {
+  def favorites = Account.AuthenticatedAction {
     implicit request =>
-
-    // Check that the user is logged in
-      implicit val user = Account.getCurrentUser
-      if (user.isDefined) {
-        val favorites = user.get.getFavorites
+      implicit user =>
+        val favorites = user.getFavorites
         Ok // TODO: Create view
-
-      } else // User not logged in
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
   }
 }

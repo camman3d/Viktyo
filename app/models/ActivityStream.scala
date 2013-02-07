@@ -184,6 +184,10 @@ object ActivityStream {
     ActivityStream(NotAssigned, new Date().getTime, user, "follow", otherUser.objId, user.objId)
   }
 
+  def createNetworkJoin(user: User, network: Network): ActivityStream = {
+    ActivityStream(NotAssigned, new Date().getTime, user, "join", network.objId, network.objId)
+  }
+
   /**
     * For a status update the target is the user and the object is the update as text.
    * @param user The user making the update

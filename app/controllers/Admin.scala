@@ -1,6 +1,6 @@
 package controllers
 
-import play.api.mvc.{Action, Controller}
+import play.api.mvc._
 import models.{User, ViktyoConfiguration}
 
 /**
@@ -12,26 +12,30 @@ import models.{User, ViktyoConfiguration}
  */
 object Admin extends Controller {
 
-  def dashboard = Action {
-    implicit request =>
-
-    // Check that the user is logged in and is an admin
-      implicit val user = Account.getCurrentUser
-      if (user.isDefined && user.get.getProperty("accountType").get == "admin") {
-        Ok(views.html.admin.dashboard())
-
-      } else // Not authorized
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to view that page.")
+  // Authentication helper
+  def AdminAuthenticatedAction(f: Request[AnyContent] => (User => Result)) = {
+    Action {
+      implicit request =>
+        val user = Account.getCurrentUser
+        if (user.isDefined && user.get.getProperty("accountType").get == "admin")
+          f(request)(user.get)
+        else // User not logged in
+          Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
+    }
   }
 
-  def configure = Action {
+  def dashboard = AdminAuthenticatedAction {
     implicit request =>
+      implicit user =>
+        Ok(views.html.admin.dashboard())
+  }
 
-    // Check that the user is logged in and is an admin
-      implicit val user = Account.getCurrentUser
-      if (user.isDefined && user.get.getProperty("accountType").get == "admin") {
+  def configure = AdminAuthenticatedAction {
+    implicit request =>
+      implicit user =>
+
+      // Get the configurations
         val configurations = ViktyoConfiguration.list
-
         val userSignupRequiredFields = configurations.find(_.name == "signup.user.requiredFields").get.data.right.get
         val userSignupFields = configurations.find(_.name == "signup.user.availableFields").get.data.right.get.zip(
           configurations.find(_.name == "signup.user.availableFieldsTypes").get.data.right.get
@@ -39,63 +43,42 @@ object Admin extends Controller {
 
         Ok(views.html.admin.configure(userSignupFields))
 
-      } else // Not authorized
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to view that page.")
   }
 
-  def setConfiguration() = Action(parse.urlFormEncoded) {
+  def setConfiguration() = AdminAuthenticatedAction {
     implicit request =>
-    // Check that the user is logged in and is an admin
-      val user = Account.getCurrentUser
-      if (user.isDefined && user.get.getProperty("accountType").get == "admin") {
-        val configuration = ViktyoConfiguration.findById(request.body("configuration")(0).toLong)
-        configuration.get.setData(request.body("configuration")(0)).save
+      implicit user =>
+        val configuration = ViktyoConfiguration.findById(request.body.asFormUrlEncoded.get("configuration")(0).toLong)
+        configuration.get.setData(request.body.asFormUrlEncoded.get("configuration")(0)).save
         Redirect(routes.Admin.configure()).flashing("success" -> "Configuration saved")
-
-      } else // Not authorized
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to view that page.")
   }
 
-  def users = Action {
+  def users = AdminAuthenticatedAction {
     implicit request =>
-      // Check that the user is logged in and is an admin
-      val user = Account.getCurrentUser
-      if (user.isDefined && user.get.getProperty("accountType").get == "admin") {
+      implicit user =>
         val page = request.queryString.get("page").getOrElse(Seq("0"))(0).toInt
         val users = User.list(page)
         Ok // TODO: Redirect with success message
 
-      } else // Not authorized
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to view that page.")
   }
 
-  def toggleAdmin(id: Long) = Action {
+  def toggleAdmin(id: Long) = AdminAuthenticatedAction {
     implicit request =>
-    // Check that the user is logged in and is an admin
-      val user = Account.getCurrentUser
-      if (user.isDefined && user.get.getProperty("accountType").get == "admin") {
+      implicit user =>
         val otherUser = User.findById(id).get
         if (otherUser.getProperty("accountType").get == "admin")
           otherUser.setProperty("accountType", "user").save
         else
           otherUser.setProperty("accountType", "admin").save
         Ok // TODO: Redirect with success message
-
-      } else // Not authorized
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to view that page.")
   }
 
-  def deleteUser(id: Long) = Action {
+  def deleteUser(id: Long) = AdminAuthenticatedAction {
     implicit request =>
-    // Check that the user is logged in and is an admin
-      val user = Account.getCurrentUser
-      if (user.isDefined && user.get.getProperty("accountType").get == "admin") {
+      implicit user =>
         val otherUser = User.findById(id).get
         otherUser.delete()
         Ok // TODO: Redirect with success message
-
-      } else // Not authorized
-        Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to view that page.")
   }
 
 
