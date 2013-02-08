@@ -96,7 +96,7 @@ object FeedTools {
 
       // Image post. Get the target the person posted the picture on
       val target = ViktyoObject.getObjectType(activityStream.target)
-      val image = Image.findById(activityStream.obj).get
+      val image = Image.findByObjId(activityStream.obj).get
       if (target == 'user) {
 
         // It's a user (their own profile)

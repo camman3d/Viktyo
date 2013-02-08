@@ -3,6 +3,8 @@
 @main("posting", "VIKTYO", Some(user)) {
 
     <script src="@routes.Assets.at("javascripts/posting.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/formValidator.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/fileUpload.js")" type="text/javascript"></script>
 
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/posting.css")">
 
@@ -21,6 +23,7 @@
                                     @posting.getType
                                 </div>
                             </div>
+                            TODO: Panoramio information
                         </div>
                     }
                 } else {
@@ -53,11 +56,15 @@
                 </div>
                 <hr>
                 <div>
-                    <div>
-                        @images
+                    <div class="pad-bottom-med">
+                        @for(i <- 0 until math.min(images.size, 8)) {
+                            <div class="postingImageThumbnail pad-right-med">
+                                <img src="@images(i)._2.uri" alt="@images(i)._2.name">
+                            </div>
+                        }
                     </div>
-                    <a class="btn" href="#"><i class="icon-upload"></i> Upload Image</a>
-                    <a class="pad-left-high">View all images</a>
+                    <a class="btn" href="#imageModal" data-toggle="modal"><i class="icon-upload"></i> Upload Image</a>
+                    <a href="#" class="pad-left-high">View all images</a>
                 </div>
                 <hr>
                 <form action="@routes.Postings.addComment(posting.id.get)" method="@routes.Postings.addComment(0).method">
@@ -80,6 +87,31 @@
                     </div>
                 }
             </div>
+        </div>
+    </div>
+
+    <!-- add image Modal -->
+    <div id="imageModal" class="modal modal-med hide fade" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div>
+        <div class="modal-body">
+            <h3 id="imageModalLabel">Add an image</h3>
+
+            <form class="form-horizontal validate" action="@routes.Postings.addImage(posting.id.get)" method="@routes.Postings.addImage(posting.id.get).method" enctype="multipart/form-data">
+                @views.html.account.formHelpers.field(("Image", "file"), required = true)
+                @views.html.account.formHelpers.field(("Name", "text"), required = true)
+
+                <div class="control-group">
+                    <div class="controls">
+                        <button type="submit" class="btn">Go!</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+        <div class="modal-footer">
+
         </div>
     </div>
 

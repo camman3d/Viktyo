@@ -76,6 +76,7 @@ GET     /admin/users/:id/delete         controllers.Admin.deleteUser(id: Long)
 GET     /admin/users/:id/toggleAdmin    controllers.Admin.toggleAdmin(id: Long)
 GET     /admin/pages                    controllers.Admin.pages
 GET     /admin/listings                 controllers.Admin.listings
+GET     /admin/networks                 controllers.Admin.networks
 GET     /admin/stats                    controllers.Admin.stats
 GET     /admin/finance                  controllers.Admin.finance
 

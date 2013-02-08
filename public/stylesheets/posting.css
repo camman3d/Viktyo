@@ -25,3 +25,16 @@
 .postingCommentTime {
     font-size: 9pt;
 }
+
+.postingImageThumbnail {
+    width: 75px;
+    height: 75px;
+    overflow: hidden;
+    display: inline-block;
+}
+.postingImageThumbnail img {
+    min-height: 100px;
+    min-width: 100px;
+    max-height: 200px;
+    max-width: 200px;
+}

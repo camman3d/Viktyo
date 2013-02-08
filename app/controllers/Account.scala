@@ -3,7 +3,7 @@ package controllers
 import play.api.mvc._
 import models._
 import anorm.NotAssigned
-import tools.{ImageUploader, Hasher}
+import tools.{Emailer, ImageUploader, Hasher}
 import java.util.Date
 import play.api.libs.json.Json
 import scala.Some
@@ -276,5 +276,23 @@ object Account extends Controller {
         } else // User not logged in
           Redirect(routes.Application.index()).flashing("alert" -> "You are not logged in")
     }
+  }
+
+  def suggestNetwork = AuthenticatedAction {
+    implicit request =>
+      implicit user =>
+
+        // Suggest a network
+        val name = request.body.asFormUrlEncoded.get("name")(0)
+        val description = request.body.asFormUrlEncoded.get("description")(0)
+        val moderators = request.body.asFormUrlEncoded.get("moderators")(0)
+        val website = request.body.asFormUrlEncoded.get("website")(0)
+        val network = Network(NotAssigned, name, description).setProperty("accepted", "false")
+          .setProperty("moderators", moderators).setProperty("website", website)
+          .setProperty("creator", user.id.get.toString).save
+
+        Emailer.sendNetworkSuggestionEmail(user, network)
+        Redirect(routes.Account.profile()).flashing("success" -> ("Thank you for suggesting a network. Once our team " +
+          "reviews and approves it, it will become available. You'll be notified when that happens."))
   }
 }
