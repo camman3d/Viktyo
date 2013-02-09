@@ -1,4 +1,4 @@
-@(posting: Posting, images: List[(ActivityStream, Image)], comments: List[(ActivityStream, Text)])(implicit request: RequestHeader, user: User)
+@(posting: Posting, favorites: List[User], followers: List[User], images: List[(ActivityStream, Image)], comments: List[(ActivityStream, Text)])(implicit request: RequestHeader, user: User)
 
 @main("posting", "VIKTYO", Some(user)) {
 
@@ -39,8 +39,16 @@
                         <h2 class="pad-bottom-none">@posting.name</h2>
                     </div>
                     <div class="pull-right pad-top-med">
-                        <a class="pad-right-low iconLight-50" href="@routes.Postings.favorite(posting.id.get)"><img src="/assets/images/icons/glyphicons_049_star.png" alt="Favorite this"></a>
-                        <a class="iconLight-50" href="#"><img src="/assets/images/icons/glyphicons_006_user_add.png" alt="Follow this"></a>
+                        @if(favorites.contains(user)) {
+                            <a class="pad-right-low iconLight-75" href="@routes.Postings.unfavorite(posting.id.get)"><img src="/assets/images/icons/glyphicons_049_star.png" alt="Unfavorite this"></a>
+                        } else {
+                            <a class="pad-right-low iconLight-25" href="@routes.Postings.favorite(posting.id.get)"><img src="/assets/images/icons/glyphicons_049_star.png" alt="Favorite this"></a>
+                        }
+                        @if(followers.contains(user)) {
+                            <a class="iconLight-75" href="@routes.Postings.unfollow(posting.id.get)"><img src="/assets/images/icons/glyphicons_006_user_add.png" alt="Unfollow this"></a>
+                        } else {
+                            <a class="iconLight-25" href="@routes.Postings.follow(posting.id.get)"><img src="/assets/images/icons/glyphicons_006_user_add.png" alt="Follow this"></a>
+                        }
                     </div>
                 </div>
                 <div class="clearfix"></div>
@@ -77,8 +85,11 @@
                             <img class="profile-pic-small" src="@comment._1.actor.getProfilePictureUrl">
                         </div>
                         <div class="span11">
+                            <div class="pull-right comment">
+                                <a class="btn btn-small" href="@routes.Postings.deleteActivityStream(posting.id.get, comment._1.id.get)"><i class="icon-trash"></i></a>
+                            </div>
                             <div>
-                                <strong>@comment._1.actor.fullname</strong> - @comment._2.textValue
+                                <a href="@routes.Users.view(comment._1.actor.id.get)">@comment._1.actor.fullname</a> - @comment._2.textValue
                             </div>
                             <div class="postingCommentTime">
                                 @tools.TimeTools.getFeedTime(comment._1.published)

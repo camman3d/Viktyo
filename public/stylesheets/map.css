@@ -1,0 +1,121 @@
+#map_canvas {
+    width: 100%;
+    height: 600px;
+}
+
+.mapPopup {
+    position: absolute;
+}
+
+.mapPopup.single {
+    margin-left: -180px;
+    margin-top: -160px;
+}
+
+.mapPopupSingle {
+    width: 350px;
+    height: 125px;
+    background: white;
+
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+
+    box-shadow: 2px 2px 12px rgba(0,0,0,0.4);
+    -moz-box-shadow: 2px 2px 12px rgba(0,0,0,0.4);
+    -webkit-box-shadow: 2px 2px 12px rgba(0,0,0,0.4);
+}
+
+.mapPopupSingleImage {
+    width: 120px;
+    height: 125px;
+    background: black;
+    display: inline-block;
+    overflow: hidden;
+    position: relative;
+
+    border-radius: 10px 0 0 10px;
+    -moz-border-radius: 10px 0 0 10px;
+    -webkit-border-radius: 10px 0 0 10px;
+}
+
+.mapPopupSingleImage img:first-child {
+    height: 100%;
+}
+
+.mapPopupSingleImagePanoramio {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 115px;
+    padding: 2px 0 3px 5px;
+    font-size: 9pt;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 12px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.75);
+    color: #ccc;
+}
+
+.mapPopupSingleImagePanoramioLogo {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 120px;
+    height: auto;
+    max-height: none;
+    opacity: 0.4;
+}
+
+.mapPopupSingleImagePanoramio a {
+    color: #666;
+}
+.mapPopupSingleImagePanoramio a:hover {
+    color: #999;
+}
+
+.mapPopupSingleContent {
+    width: 220px;
+    height: 125px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 5px;
+}
+
+.mapPopupSingleContent h4 {
+    margin: 15px 0 0 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.mapPopupLocation {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.mapPopupPoster {
+    color: #aaa;
+    margin-top: 15px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.mapPopupPoint {
+    border-top: 10px solid white;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    top: 125px;
+    left: 50%;
+    margin-left: -5px;
+
+}

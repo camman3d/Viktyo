@@ -59,6 +59,8 @@ POST    /posting/:id/add/image          controllers.Postings.addImage(id: Long)
 GET     /posting/:postId/remove/:id     controllers.Postings.deleteActivityStream(postId: Long, id: Long)
 GET     /posting/:id/favorite           controllers.Postings.favorite(id: Long)
 GET     /posting/:id/unfavorite         controllers.Postings.unfavorite(id: Long)
+GET     /posting/:id/follow             controllers.Postings.follow(id: Long)
+GET     /posting/:id/unfollow           controllers.Postings.unfollow(id: Long)
 
 # Users
 GET     /users/:id                      controllers.Users.view(id: Long)

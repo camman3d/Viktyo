@@ -1,6 +1,30 @@
 @(postings: String)(implicit request: RequestHeader, user: User)
 
 @main("postingsMap", "VIKTYO - Listings", Some(user)) {
-    @postings
+
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBSwVL1Smpqcwf2d_0hiecqQKu7XpFno_E&amp;sensor=true"></script>
+    <script src="@routes.Assets.at("javascripts/mustache.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/map.js")" type="text/javascript"></script>
+
+    <script type="text/javascript">
+            var postings = @Html(postings);
+    </script>
+
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/map.css")">
+
+    <div class="container">
+        <div class="row">
+            <div class="span3">
+                    Sorting and filtering goes here
+            </div>
+            <div class="span9">
+                <div id="map_canvas"></div>
+
+                <div class="postingPanoramioCopyright">
+                        Photos provided by Panoramio are under the copyright of their owners
+                </div>
+            </div>
+        </div>
+    </div>
 
 }

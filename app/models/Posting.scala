@@ -95,7 +95,8 @@ case class Posting(
     "description" -> this.getDescription,
     "followers" -> this.countFavorites,
     "favorites" -> this.countFavorites,
-    "views" -> this.getViews
+    "views" -> this.getViews,
+    "color" -> this.getColor
   )
 
   def getProperty(attribute: String): Option[String] = {
@@ -192,6 +193,9 @@ case class Posting(
   // Type
 
   def getType: String = StringUtils.capitalize(getProperty("postingType").get.replaceAll("_", " "))
+
+  def getColor: String =
+    ViktyoConfiguration.findByName("postings.colors." + getProperty("postingType").get).get.getDataString
 
 }
 

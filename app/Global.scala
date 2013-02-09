@@ -27,6 +27,17 @@ object Global extends GlobalSettings {
     if(!ViktyoConfiguration.findByName("signup.organization.requiredFields").isDefined)
       ViktyoConfiguration(NotAssigned, "signup.organization.requiredFields", Right(List("Email"))).save
 
+    if(!ViktyoConfiguration.findByName("postings.types").isDefined)
+      ViktyoConfiguration(NotAssigned, "postings.types", Right(List("Internship", "Job", "Study Abroad", "Volunteer"))).save
+    if(!ViktyoConfiguration.findByName("postings.colors.internship").isDefined)
+      ViktyoConfiguration(NotAssigned, "postings.colors.internship", Left("blue")).save
+    if(!ViktyoConfiguration.findByName("postings.colors.job").isDefined)
+      ViktyoConfiguration(NotAssigned, "postings.colors.job", Left("orange")).save
+    if(!ViktyoConfiguration.findByName("postings.colors.study_abroad").isDefined)
+      ViktyoConfiguration(NotAssigned, "postings.colors.study_abroad", Left("green")).save
+    if(!ViktyoConfiguration.findByName("postings.colors.volunteer").isDefined)
+      ViktyoConfiguration(NotAssigned, "postings.colors.volunteer", Left("purple")).save
+
     // Test data
     if(!ViktyoConfiguration.findByName("testdata.created").isDefined) {
       ViktyoConfiguration(NotAssigned, "testdata.created", Left("true")).save

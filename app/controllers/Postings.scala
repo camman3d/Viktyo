@@ -134,9 +134,13 @@ object Postings extends Controller {
             (a, Text.findByObjId(a.obj).get)
           )
 
+          // Get those who favorited and follow
+          val favorites = posting.getFavorites
+          val followers = posting.getFollowers
+
           // Increment the views
           val updatedPosting = posting.incrementViews.save
-          Ok(views.html.postings.view(updatedPosting, images, comments))
+          Ok(views.html.postings.view(updatedPosting, favorites, followers, images, comments))
   }
 
   def create = Account.AuthenticatedAction {
