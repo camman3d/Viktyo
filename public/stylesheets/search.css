@@ -1,0 +1,31 @@
+#searchOverlay {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: rgba(255,255,255,0.7);
+    padding-top: 50px;
+}
+
+#searchForm input[type="text"] {
+    height: 50px;
+    width: 400px;
+    font-size: 20pt;
+    background: rgba(255,255,255,0.5);
+}
+
+#searchOverlay > .container > span:first-child {
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 10px 5px rgba(255,255,255,0.8);
+    -moz-box-shadow: 0 0 10px 5px rgba(255,255,255,0.8);
+    -webkit-box-shadow: 0 0 10px 5px rgba(255,255,255,0.8);
+    display: inline-block;
+}
+
+#searchResults {
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 10px 5px rgba(255,255,255,0.8);
+    -moz-box-shadow: 0 0 10px 5px rgba(255,255,255,0.8);
+    -webkit-box-shadow: 0 0 10px 5px rgba(255,255,255,0.8);
+}

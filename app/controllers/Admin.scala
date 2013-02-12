@@ -34,14 +34,22 @@ object Admin extends Controller {
     implicit request =>
       implicit user =>
 
-      // Get the configurations
+        // Get the configurations
         val configurations = ViktyoConfiguration.list
+
+        // User signup fields
         val userSignupRequiredFields = configurations.find(_.name == "signup.user.requiredFields").get.data.right.get
         val userSignupFields = configurations.find(_.name == "signup.user.availableFields").get.data.right.get.zip(
           configurations.find(_.name == "signup.user.availableFieldsTypes").get.data.right.get
         ).map(field => (field._1, field._2, userSignupRequiredFields.contains(field._1)))
 
-        Ok(views.html.admin.configure(userSignupFields))
+        // Organization signup fields
+        val orgSignupRequiredFields = configurations.find(_.name == "signup.organization.requiredFields").get.data.right.get
+        val orgSignupFields = configurations.find(_.name == "signup.organization.availableFields").get.data.right.get.zip(
+          configurations.find(_.name == "signup.organization.availableFieldsTypes").get.data.right.get
+        ).map(field => (field._1, field._2, orgSignupRequiredFields.contains(field._1)))
+
+        Ok(views.html.admin.configure(userSignupFields, orgSignupFields))
 
   }
 

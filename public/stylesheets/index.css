@@ -1,0 +1,22 @@
+.slideIcon {
+    background: #ccc;
+    border-radius: 5px;
+    height: 10px;
+    width: 10px;
+    display: inline-block;
+    margin: 5px 5px 0 5px;
+}
+
+#sliderMenu {
+    text-align: center;
+}
+
+#slideIcons {
+    display: inline-block;
+    margin: 0 15px;
+    padding-top: 10px;
+}
+
+.slideIcon.active {
+    background: #666;
+}

@@ -1,4 +1,11 @@
-@(userSignupFields: List[(String, String, Boolean)])(implicit request: RequestHeader, user: User)
+@(userSignupFields: List[(String, String, Boolean)], orgSignupFields: List[(String, String, Boolean)])(implicit request: RequestHeader, user: User)
+
+@selectOption(value: String, fieldType: String) = {
+    value="@value"
+    @if(fieldType.split("\\[")(0) == value) {
+        selected="selected"
+    }
+}
 
 @main("admin", "VIKTYO - Admin Dashboard", Some(user)) {
     <div class="container">
@@ -18,17 +25,48 @@
         <div>
             <h2>Configuration</h2>
 
-            <h3 class="blue">User Signup</h3>
-            <p>
-                These are the fields available when a user signs up.
-            </p>
-
+            <h3 class="blue">Signup</h3>
+            <h4 class="orange">User Signup Fields</h4>
             @for(field <- userSignupFields) {
-                @views.html.admin.configureHelpers.field(field, "signup.user")
+                <div>
+                    Name: <input type="text" value="@field._1"/>
+                    Type:
+                    <select>
+                        <option @selectOption("text", field._2) >Text</option>
+                        <option @selectOption("password", field._2) >Password</option>
+                        <option @selectOption("select", field._2) >Select</option>
+                        <option @selectOption("radio", field._2) >Radio</option>
+                        <option @selectOption("checkbox", field._2) >Checkbox</option>
+                    </select>
+                    Required: <input type="checkbox" @if(field._3){ checked="checked" } >
+                </div>
             }
 
-            <button class="btn configSave" data-config-attr="signup.user">Save Changes</button>
 
+            <h4 class="orange">Organization Signup Fields</h4>
+            <!-- Field name, type, and required -->
+            @for(field <- orgSignupFields) {
+                <div>
+                    Name: <input type="text" value="@field._1"/>
+                    Type:
+                    <select>
+                        <option @selectOption("text", field._2) >Text</option>
+                        <option @selectOption("password", field._2) >Password</option>
+                        <option @selectOption("select", field._2) >Select</option>
+                        <option @selectOption("radio", field._2) >Radio</option>
+                        <option @selectOption("checkbox", field._2) >Checkbox</option>
+                    </select>
+                    Required: <input type="checkbox" @if(field._3){ checked="checked" } >
+                </div>
+            }
+
+            <h3 class="blue">Postings</h3>
+            <h4 class="orange">Available Fields</h4>
+            <h4 class="orange">Types</h4>
+            <h4 class="orange">Colors</h4>
+
+            <h3 class="blue">Profile Information</h3>
+            <h4 class="orange">Available Fields</h4>
 
         </div>
     </div>

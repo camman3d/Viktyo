@@ -2,5 +2,43 @@
 
 @main("index", "VIKTYO", user) {
 
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/index.css")">
 
+    <script src="@routes.Assets.at("javascripts/swipe.min.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/index.js")" type="text/javascript"></script>
+
+
+    <div id='slider'>
+        <ul>
+            <li style='display:block'>
+                    one
+            </li>
+            <li style='display:none'>
+                    two
+            </li>
+            <li style='display:none'>
+                    three
+            </li>
+            <li style='display:none'>
+                    four
+            </li>
+            <li style='display:none'>
+                    five
+            </li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div id="sliderMenu">
+            <button class="btn" id="sliderPrev"> Prev </button>
+            <div id="slideIcons">
+                <div class="slideIcon active"></div>
+                <div class="slideIcon"></div>
+                <div class="slideIcon"></div>
+                <div class="slideIcon"></div>
+                <div class="slideIcon"></div>
+            </div>
+            <button class="btn" id="sliderNext"> Next </button>
+        </div>
+    </div>
 }

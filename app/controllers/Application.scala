@@ -35,11 +35,9 @@ object Application extends Controller {
       val users = allUsers.filter(u => {
         val atype = u.getProperty("accountType").get
         atype == "user" || atype == "admin"
-      })
-      val organizations = allUsers.filter(u => u.getProperty("accountType").get == "organization")
-      val postings = Posting.search(searchString)
-
-
+      }).distinct
+      val organizations = allUsers.filter(u => u.getProperty("accountType").get == "organization").distinct
+      val postings = Posting.search(searchString).distinct
 
       Ok(Json.obj(
         "users" -> JsArray(users.map(u => u.toJson)),
