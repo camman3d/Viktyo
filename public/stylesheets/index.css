@@ -1,3 +1,9 @@
+#slideshow {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+}
+
 .slideIcon {
     background: #ccc;
     border-radius: 5px;
@@ -9,6 +15,19 @@
 
 #sliderMenu {
     text-align: center;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    width: 500px;
+    margin-left: -250px;
+}
+
+#sliderMenu button {
+    opacity: 0.35;
+}
+
+#sliderMenu button:hover {
+    opacity: 1;
 }
 
 #slideIcons {
@@ -19,4 +38,14 @@
 
 .slideIcon.active {
     background: #666;
+}
+
+.slide {
+    height: 300px;
+    overflow: hidden;
+}
+
+.slide img {
+    width: 100%;
+    height: auto;
 }

@@ -77,7 +77,15 @@ case class User(
     Json.obj(
       "id" -> this.id.get,
       "username" -> this.username,
-      "fullname" -> this.fullname
+      "fullname" -> this.fullname,
+      "profilePicture" -> getProfilePictureUrl,
+      "location" -> getLocation,
+
+      // Organization only fields
+      "description" -> getDescription,
+      "backgroundPicture" -> getBackgroundPicture,
+      "networks" -> countNetworks,
+      "postings" -> countPostings
     )
 
   def getProperty(attribute: String): Option[String] = {
@@ -118,9 +126,17 @@ case class User(
     User(this.id, this.fullname, this.username, password, this.properties, this.objId)
   }
 
+  def getLocation = getProperty("location").getOrElse("Unknown location")
+
+  def getDescription = getProperty("description").getOrElse("No description has been written yet")
+
+  // Pictures (profile)
+
   def getProfilePicture: Option[String] = getProperty("profilePicture")
 
   def getProfilePictureUrl: String = getProfilePicture.getOrElse("/assets/images/profile-pic-placeholder.jpg")
+
+  def getBackgroundPicture = getProperty("backgroundPicture").getOrElse("/assets/images/organizations/building-orange.jpg")
 
   // Generic Property List functions
 
@@ -149,6 +165,8 @@ case class User(
       false
   }
 
+  def countPropertyList(attribute: String): Int = getProperty(attribute).map(_.split(",").size).getOrElse(0)
+
   // Network functions
   def getNetworks: List[Network] = getPropertyList("networks").map(n => Network.findById(n).get)
 
@@ -157,6 +175,8 @@ case class User(
   def removeNetwork(network: Network): User = removeFromPropertyList("networks", network.id.get)
 
   def hasNetwork(network: Network): Boolean = hasInPropertyList("networks", network.id.get)
+
+  def countNetworks: Int = countPropertyList("networks")
 
   // Favorite functions
   def getFavorites: List[Posting] = getPropertyList("favorites").map(n => Posting.findById(n).get)
@@ -184,6 +204,18 @@ case class User(
   def removeFollower(user: User): User = removeFromPropertyList("followers", user.id.get)
 
   def hasFollower(user: User): Boolean = hasInPropertyList("followers", user.id.get)
+
+  // Postings (this this organization created)
+  def getPostings: List[Posting] = getPropertyList("postings").map(n => Posting.findById(n).get)
+
+  def addPosting(posting: Posting): User = addToPropertyList("postings", posting.id.get)
+
+  def removePosting(posting: Posting): User = removeFromPropertyList("postings", posting.id.get)
+
+  def hasPosting(posting: Posting): Boolean = hasInPropertyList("postings", posting.id.get)
+
+  def countPostings: Int = countPropertyList("postings")
+
 }
 
 object User {

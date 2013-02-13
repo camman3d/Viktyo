@@ -1,11 +1,15 @@
-.organization {
+.organizationHolder {
     width: 33%;
     float: left;
+}
+
+.organization {
+
     background: #f2f2f2;
     border: 1px solid white;
     border-radius: 10px;
     overflow: hidden;
-
+    margin: 2px;
     position: relative;
 }
 
@@ -20,11 +24,17 @@
     margin-bottom: 25px;
 }
 
-.organizationBackgroundImg > img:first-child {
+.organizationBackgroundHolder {
     height: 100%;
-    width: auto;
+    overflow: hidden;
+}
+
+.organizationBackgroundHolder > img {
+    height: auto;
+    width: 100%;
 
 }
+
 
 .organizationLogo {
     position: absolute;
@@ -75,6 +85,7 @@
     overflow: hidden;
     height: 100%;
     padding: 10px;
+    width: 100%;
     display: none;
 }
 
@@ -112,6 +123,7 @@
     background: #EE9D2F;
     text-align: center;
     padding: 10px 0;
+    margin: 0 -10px;
 }
 
 .organizationLearnMoreOverlay a {
