@@ -2,6 +2,7 @@ package controllers
 
 import play.api.mvc.Controller
 import models.User
+import play.api.libs.json.JsArray
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,8 +17,9 @@ object Organizations extends Controller {
     implicit request =>
       implicit user =>
         val organizations = User.listByAccountType("organization")
+        val organizationsJson = JsArray(organizations.map(_.toJson)).toString()
         if (view == 'list)
-          Ok // TODO: Create list view
+          Ok(views.html.organizations.browseList(organizationsJson))
         else
           Ok // TODO: Create map view
   }

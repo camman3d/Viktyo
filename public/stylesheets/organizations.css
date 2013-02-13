@@ -1,0 +1,119 @@
+.organization {
+    width: 33%;
+    float: left;
+    background: #f2f2f2;
+    border: 1px solid white;
+    border-radius: 10px;
+    overflow: hidden;
+
+    position: relative;
+}
+
+.organization:hover {
+    border: 1px solid #EE9D2F;
+}
+
+.organizationBackgroundImg {
+    height: 175px;
+    text-align: center;
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.organizationBackgroundImg > img:first-child {
+    height: 100%;
+    width: auto;
+
+}
+
+.organizationLogo {
+    position: absolute;
+    top: 140px;
+    left: 20px;
+}
+
+.organizationInfo {
+    padding: 0 10px;
+}
+
+.organizationInfo h4 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.organization > hr {
+    margin: 20px 10px 10px 10px;
+}
+
+.organizationDescription {
+    padding: 0 10px 10px 10px;
+    font-size: 9pt;
+    color: #888;
+    height: 85px;
+    overflow: hidden;
+
+
+    text-overflow: ellipsis;
+}
+
+.organizationLearnMore {
+    background: #EE9D2F;
+    text-align: center;
+    padding: 10px;
+}
+
+.organizationLearnMore a {
+    color: white;
+}
+
+.organizationOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(255,255,255,0.9);
+    overflow: hidden;
+    height: 100%;
+    padding: 10px;
+    display: none;
+}
+
+.organization:hover .organizationOverlay {
+    display: block;
+}
+
+.organizationOverlay p {
+    height: 175px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.organizationStat {
+    color: #EE9D2F;
+    margin: 10px;
+}
+
+.organizationStatNumber {
+    display: inline-block;
+    border: 1px solid #ee9d2f;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.organizationLearnMoreOverlay {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    height: 20px;
+    width: 100%;
+    background: #EE9D2F;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.organizationLearnMoreOverlay a {
+    color: white;
+}

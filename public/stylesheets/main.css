@@ -207,6 +207,21 @@ hr.dark {
     height: 50px;
 }
 
+.profile-pic-small-border {
+    -webkit-border-radius: 27px;
+    -moz-border-radius: 27px;
+    border-radius: 27px;
+
+    width: 50px;
+    height: 50px;
+    background: white;
+    padding: 2px;
+
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    -moz-box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    -webkit-box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+}
+
 .profile-pic-large {
     -webkit-border-radius: 75px;
     -moz-border-radius: 75px;

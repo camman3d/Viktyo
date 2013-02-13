@@ -1,0 +1,78 @@
+@(organizations: String)(implicit request: RequestHeader, user: User)
+
+@main("organizationsList", "VIKTYO - Organizations", Some(user)) {
+
+    <script src="@routes.Assets.at("javascripts/mustache.js")" type="text/javascript"></script>
+    <!--<script src="@routes.Assets.at("javascripts/postingTemplates.js")" type="text/javascript"></script>-->
+    <script src="@routes.Assets.at("javascripts/organizations.js")" type="text/javascript"></script>
+
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/organizations.css")">
+
+    <script type="text/javascript">
+        var organizations = @Html(organizations);
+    </script>
+
+    <div class="container">
+        <div class="row">
+            <div class="span3">
+                Sorting and filtering goes here
+            </div>
+            <div class="span9">
+                <div id="organizations">
+
+                    <div class="organization">
+                        <div class="organizationBackgroundImg">
+                            <img src="/assets/images/postings/orange_world.jpg">
+                            <div class="organizationLogo profile-pic-small-border">
+                                <img class="profile-pic-small" src="/assets/images/profile-pic-placeholder.jpg">
+                            </div>
+                        </div>
+                        <div class="organizationInfo">
+                            <h4>Organization Name</h4>
+                            <h4><small><i class="icon-map-marker"></i> Location, World</small></h4>
+                        </div>
+                        <hr>
+                        <div class="organizationDescription">
+                                Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+                                Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+                                Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+                                Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+                        </div>
+                        <div class="organizationLearnMore">
+                            <a href="#">Learn More</a>
+                        </div>
+                        <div class="organizationOverlay">
+                            <div class="profile-pic-small-border">
+                                <img class="profile-pic-small" src="/assets/images/profile-pic-placeholder.jpg">
+                            </div>
+                            <p>
+                                Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+                                Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+                                Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+                                Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+                            </p>
+                            <div class="organizationStats">
+                                <div class="organizationStat">
+                                    <span class="organizationStatNumber">8</span> Listings
+                                </div>
+                                <div class="organizationStat">
+                                    <span class="organizationStatNumber">4</span> Networks
+                                </div>
+                            </div>
+                            <div class="organizationLearnMoreOverlay">
+                                <a href="#">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="clearfix"></div>
+                <hr>
+                <div class="postingPanoramioCopyright">
+                    Photos provided by Panoramio are under the copyright of their owners
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
