@@ -5,7 +5,7 @@ import play.api.db.DB
 import play.api.Play.current
 import anorm.SqlParser._
 import anorm.~
-import tools.ImageUploader
+import tools.images.ImageUploader
 
 case class Image(
   id: Pk[Long],

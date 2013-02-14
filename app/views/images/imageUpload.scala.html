@@ -1,0 +1,13 @@
+@()
+
+<script src="@routes.Assets.at("javascripts/imageUpload.js")" type="text/javascript"></script>
+
+<form class="form-horizontal imageUpload">
+    @views.html.account.formHelpers.field(("Image", "file"), required = false)
+
+    <div class="control-group">
+        <div class="controls">
+            <button type="submit" class="btn">Upload Image</button>
+        </div>
+    </div>
+</form>

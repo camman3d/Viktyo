@@ -1,9 +1,9 @@
 package controllers
 
 import play.api.mvc._
-import models.{ActivityStream, User, Network}
-import tools.ImageUploader
+import models.{Image, ActivityStream, User, Network}
 import tools.social.NetworkActions
+import tools.images.ImageUploader
 
 /**
  * Controller for network actions
@@ -39,7 +39,7 @@ object Networks extends Controller {
             Redirect(routes.Home.feed()).flashing("alert" -> "You are not part of that network.")
   }
 
-  def addImage(id: Long) = AuthenticatedNetworkAction(id) {
+  def addImage(id: Long, imageId: Long) = AuthenticatedNetworkAction(id) {
     implicit request =>
       implicit user =>
         network =>
@@ -47,15 +47,16 @@ object Networks extends Controller {
           // Make sure the user is part of the network
           if (user.hasNetwork(network)) {
 
-            // Handle the image upload
-            val file = request.body.asMultipartFormData.get.file("image").get
-            val name = request.body.asMultipartFormData.get.dataParts("name")(0)
-            val image = ImageUploader.uploadPicture(file, name)
+            // Get the image and make sure you own it
+            val image = Image.findById(imageId)
+            if (image.isDefined && image.get.getProperty("owner").get == user.id.get.toString) {
 
-            // Create the update
-            NetworkActions.userPostsImage(user, image, network)
-            Redirect(routes.Networks.networkFeed(id)).flashing("info" -> "Image added")
+              // Create the update
+              NetworkActions.userPostsImage(user, image.get, network)
+              Redirect(routes.Networks.networkFeed(id)).flashing("info" -> "Image added")
 
+            } else
+              Redirect(routes.Networks.networkFeed(id)).flashing("alert" -> "You are not part of that network.")
           } else // Not part of network
             Redirect(routes.Home.feed()).flashing("alert" -> "You are not part of that network.")
   }

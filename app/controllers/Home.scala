@@ -1,11 +1,12 @@
 package controllers
 
 import play.api.mvc.{Action, Controller}
-import tools.{Hasher, ImageUploader, FeedTools}
+import tools.{Hasher, FeedTools}
 import models.{Network, Image, ActivityStream}
 import anorm.NotAssigned
 import java.util.Date
 import tools.social.UserActions
+import tools.images.ImageUploader
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,18 +27,20 @@ object Home extends Controller {
         Ok // TODO: Redirect with message
   }
 
-  def addImage() = Account.AuthenticatedAction {
+  def addImage(imageId: Long) = Account.AuthenticatedAction {
     implicit request =>
       implicit user =>
 
-      // Handle the image upload
-        val file = request.body.asMultipartFormData.get.file("image").get
-        val name = request.body.asMultipartFormData.get.dataParts("name")(0)
-        val image = ImageUploader.uploadPicture(file, name)
+        // Get the image and make sure you own it
+        val image = Image.findById(imageId)
+        if (image.isDefined && image.get.getProperty("owner").get == user.id.get.toString) {
 
-        // Create the update
-        UserActions.userPostsImage(user, image)
-        Ok(image.uri) // TODO: Redirect with message
+          // Create the update
+          UserActions.userPostsImage(user, image.get)
+          Redirect(routes.Home.feed()).flashing("info" -> "Image posted")
+
+        } else
+          Redirect(routes.Home.feed()).flashing("alert" -> "You cannot use that image")
   }
 
   def feed = Account.AuthenticatedAction {

@@ -2,11 +2,11 @@ package controllers
 
 import play.api.mvc._
 import models._
-import tools.ImageUploader
 import tools.social.PostingActions
 import play.api.libs.json.{Json, JsArray}
 import anorm.NotAssigned
 import java.util.Date
+import tools.images.ImageUploader
 
 object Postings extends Controller {
 
@@ -33,19 +33,20 @@ object Postings extends Controller {
           Redirect(routes.Postings.view(id)).flashing("info" -> "Comment added.")
   }
 
-  def addImage(id: Long) = AuthenticatedPostingAction(id) {
+  def addImage(id: Long, imageId: Long) = AuthenticatedPostingAction(id) {
     implicit request =>
       implicit user =>
         posting =>
 
-          // Handle the image upload
-          val file = request.body.asMultipartFormData.get.file("image").get
-          val name = request.body.asMultipartFormData.get.dataParts("name")(0)
-          val image = ImageUploader.uploadPicture(file, name)
+          // Get the image and make sure you own it
+          val image = Image.findById(imageId)
+          if (image.isDefined && image.get.getProperty("owner").get == user.id.get.toString) {
+            // Create the update
+            PostingActions.userPostsImage(user, image.get, posting)
+            Redirect(routes.Postings.view(id)).flashing("info" -> "Image added.")
 
-          // Create the update
-          PostingActions.userPostsImage(user, image, posting)
-          Redirect(routes.Postings.view(id)).flashing("info" -> "Image added.")
+          } else
+            Redirect(routes.Postings.view(id)).flashing("alert" -> "You cannot add that picture.")
   }
 
   def browse(view: Symbol) = Account.AuthenticatedAction {
@@ -182,7 +183,7 @@ object Postings extends Controller {
           Redirect(routes.Postings.view(id)).flashing("alert" -> "You are not authorized to edit listings.")
   }
 
-  def setCover(id: Long) = AuthenticatedPostingAction(id) {
+  def setCover(id: Long, imageId: Long) = AuthenticatedPostingAction(id) {
     implicit request =>
       implicit user =>
         posting =>
@@ -194,13 +195,13 @@ object Postings extends Controller {
             // Make sure the organization owns the posting
             if (posting.poster == user) {
 
-              // Handle the image upload
-              val file = request.body.asMultipartFormData.get.file("image").get
-              val name = request.body.asMultipartFormData.get.dataParts("name")(0)
-              val image = ImageUploader.uploadPicture(file, name)
-              PostingActions.orgUpdatesCover(user, posting, image)
-
-              Redirect(routes.Postings.view(posting.id.get)).flashing("info" -> "Listing cover image updated")
+              // Get the image and make sure you own it
+              val image = Image.findById(imageId)
+              if (image.isDefined && image.get.getProperty("owner").get == user.id.get.toString) {
+                PostingActions.orgUpdatesCover(user, posting, image.get)
+                Redirect(routes.Postings.view(posting.id.get)).flashing("info" -> "Listing cover image updated")
+              } else
+                Redirect(routes.Postings.view(posting.id.get)).flashing("alert" -> "You cannot use that picture")
             } else
               Redirect(routes.Postings.view(id)).flashing("alert" -> "You are not authorized to edit this listing.")
           } else

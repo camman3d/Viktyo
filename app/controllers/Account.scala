@@ -3,7 +3,7 @@ package controllers
 import play.api.mvc._
 import models._
 import anorm.NotAssigned
-import tools.{Emailer, ImageUploader, Hasher}
+import tools.{Emailer, Hasher}
 import java.util.Date
 import play.api.libs.json.Json
 import scala.Some
@@ -224,18 +224,20 @@ object Account extends Controller {
         Ok // TODO: Redirect with message
   }
 
-  def profilePicture = AuthenticatedAction {
+  def profilePicture(imageId: Long) = AuthenticatedAction {
     implicit request =>
       implicit user =>
 
-      // Handle the image upload
-        val file = request.body.asMultipartFormData.get.file("image").get
-        val name = "Profile Picture"
-        val image = ImageUploader.uploadProfilePicture(file, name)
+        // Get the image and make sure you own it
+        val image = Image.findById(imageId)
+        if (image.isDefined && image.get.getProperty("owner").get == user.id.get.toString) {
 
-        // Set the profile picture
-        UserActions.userSetProfilePicture(user, image)
-        Redirect(routes.Account.settings()).flashing("success" -> "Your profile picture was changed.")
+          // Set the profile picture
+          UserActions.userSetProfilePicture(user, image.get)
+          Redirect(routes.Account.settings()).flashing("success" -> "Your profile picture was changed.")
+
+        } else
+          Redirect(routes.Account.settings()).flashing("alert" -> "You cannot set that picture.")
   }
 
   def notifications = AuthenticatedAction {
