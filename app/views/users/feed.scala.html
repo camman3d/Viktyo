@@ -1,5 +1,15 @@
 @(targetUser: User, feed: List[ActivityStream])(implicit request: RequestHeader, user: User)
 
+@socialIcon(icon: String, attribute: String) = {
+    @if(targetUser.getProperty(attribute).isDefined) {
+        <a href="@targetUser.getProperty(attribute).get">
+            <img class="iconLight-75" src="@routes.Assets.at("images/icons/" + icon + ".png")"/>
+        </a>
+    } else {
+        <img class="iconLight-25" src="@routes.Assets.at("images/icons/" + icon + ".png")"/>
+    }
+}
+
 @main("home", "VIKTYO - Home", Some(user)) {
 
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/feed.css")">
@@ -63,14 +73,13 @@
                         </h3>
                     </div>
                     <div class="pull-right">
-                        <!-- TODO: Link these up with the account -->
-                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_410_facebook.png")"/>
-                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_411_twitter.png")"/>
-                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_397_linked_in.png")"/>
-                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_382_google_plus.png")"/>
-                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_402_youtube.png")"/>
-                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_412_instagram.png")"/>
-                        <img class="iconLight-25" src="@routes.Assets.at("images/icons/glyphicons_380_pinterest.png")"/>
+                        @socialIcon("glyphicons_410_facebook", "facebook")
+                        @socialIcon("glyphicons_411_twitter", "twitter")
+                        @socialIcon("glyphicons_397_linked_in", "linkedin")
+                        @socialIcon("glyphicons_382_google_plus", "google_plus")
+                        @socialIcon("glyphicons_402_youtube", "youtube")
+                        @socialIcon("glyphicons_412_instagram", "instagram")
+                        @socialIcon("glyphicons_380_pinterest", "pinterest")
                     </div>
                     <div class="clearfix"></div>
                 </div>

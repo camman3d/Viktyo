@@ -1,0 +1,13 @@
+@(notification: ViktyoNotification)
+
+@read = {
+    @if(!notification.read) {
+        unread
+    }
+}
+
+<div class="notification pad-bottom-low @read" data-id="@notification.id.get">
+    @if(notification.notificationType == 'following) {
+        @views.html.account.notificationHelpers.following(User.findById(notification.data("follower").toLong).get)
+    }
+</div>

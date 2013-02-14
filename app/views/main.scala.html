@@ -85,7 +85,7 @@
                             <!-- Notifications Badge -->
                             <a href="@routes.Account.notifications()">
                             @defining(models.ViktyoNotification.listByUser(user.get.id.get)) { notifications =>
-                                <span class="badge badge-warning pad-right-med">@notifications.count(n => !n.read)</span>
+                                <span id="notificationCount" class="badge badge-warning pad-right-med">@notifications.count(n => !n.read)</span>
                             }
                             </a>
 

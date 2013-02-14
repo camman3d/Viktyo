@@ -50,6 +50,7 @@ case class ViktyoNotification(
             'from -> this.from,
             'notificationType -> this.notificationType.name,
             'data -> Json.toJson(data).toString(),
+            'created -> this.created,
             'read -> this.read
           ).executeUpdate()
 

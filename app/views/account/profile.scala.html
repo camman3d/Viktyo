@@ -2,20 +2,102 @@
 
 @main("profile", "VIKTYO - Profile", Some(user)) {
 
+    <script src="@routes.Assets.at("javascripts/profile.js")" type="text/javascript"></script>
+
     <div class="container">
         <h1>Your Profile</h1>
 
-        <p>
-            Stuff that can go here...
-            <ul>
-                <li>Biography</li>
-                <li>Networks</li>
-                <li>Degrees</li>
-                <li>Timeline</li>
-                <li>Experience</li>
-                <li>Links to other social networks</li>
-            </ul>
-        </p>
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#about" data-toggle="tab">About You</a>
+            </li>
+            <li><a href="#networks" data-toggle="tab">Networks</a></li>
+            <li><a href="#social" data-toggle="tab">Social</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="about">
+                <h3>All about you!</h3>
+
+                <form class="form-horizontal profileInformation">
+                    <div class="control-group">
+                        <label class="control-label" for="location">Location</label>
+                        <div class="controls">
+                            <input type="text" id="location" placeholder="Location" value="@user.getProperty("location").getOrElse("")">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="education">Education</label>
+                        <div class="controls">
+                            <input type="text" id="education" placeholder="Education" value="@user.getProperty("education").getOrElse("")">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button type="submit" class="btn">Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="tab-pane" id="networks">
+                <h3>Your Networks</h3>
+                ...
+            </div>
+            <div class="tab-pane" id="social">
+                <h3>Social Connect!</h3>
+
+                <form class="form-horizontal profileInformation">
+                    <div class="control-group">
+                        <label class="control-label" for="facebook">Facebook</label>
+                        <div class="controls">
+                            <input type="text" id="facebook" placeholder="Facebook" value="@user.getProperty("facebook").getOrElse("")">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="twitter">Twitter</label>
+                        <div class="controls">
+                            <input type="text" id="twitter" placeholder="Twitter" value="@user.getProperty("twitter").getOrElse("")">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="linkedin">LinkedIn</label>
+                        <div class="controls">
+                            <input type="text" id="linkedin" placeholder="LinkedIn" value="@user.getProperty("linkedin").getOrElse("")">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="google_plus">Google Plus</label>
+                        <div class="controls">
+                            <input type="text" id="google_plus" placeholder="Google Plus" value="@user.getProperty("google_plus").getOrElse("")">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="youtube">YouTube</label>
+                        <div class="controls">
+                            <input type="text" id="youtube" placeholder="YouTube" value="@user.getProperty("youtube").getOrElse("")">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="instagram">Instagram</label>
+                        <div class="controls">
+                            <input type="text" id="instagram" placeholder="Instagram" value="@user.getProperty("instagram").getOrElse("")">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="pinterest">Pinterest</label>
+                        <div class="controls">
+                            <input type="text" id="pinterest" placeholder="Pinterest" value="@user.getProperty("pinterest").getOrElse("")">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button type="submit" class="btn">Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
     
 }

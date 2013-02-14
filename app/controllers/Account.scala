@@ -213,7 +213,7 @@ object Account extends Controller {
           user.setUsername(value).save
         else
           user.setProperty(attribute, value).save
-        Ok // TODO: Redirect with message
+        Ok(Json.obj("success" -> true))
   }
 
   def removeProperty() = AuthenticatedAction {
@@ -242,7 +242,7 @@ object Account extends Controller {
     implicit request =>
       implicit user =>
         val notifications = ViktyoNotification.listByUser(user.id.get)
-        Ok(notifications.toString()) // TODO: Redirect with message
+        Ok(views.html.account.notifications(notifications))
   }
 
   def readNotification = AuthenticatedAction {
@@ -253,10 +253,10 @@ object Account extends Controller {
         val notification = ViktyoNotification.findById(request.body.asFormUrlEncoded.get("notification")(0).toLong)
         if (notification.isDefined && notification.get.user == user.id.get) {
           notification.get.markRead.save
-          Ok // TODO: Redirect with message
+          Ok(Json.obj("success" -> true))
 
         } else
-          Ok // TODO: Redirect with message
+          Unauthorized(Json.obj("success" -> false, "message" -> "You are not authorized."))
   }
 
   // Authentication helpers
