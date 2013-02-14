@@ -1,9 +1,10 @@
-@()
+@(url: String)
 
 <script src="@routes.Assets.at("javascripts/imageUpload.js")" type="text/javascript"></script>
 
-<form class="form-horizontal imageUpload">
+<form class="form-horizontal imageUpload" data-url="@url" data-purpose="std">
     @views.html.account.formHelpers.field(("Image", "file"), required = false)
+    @views.html.account.formHelpers.field(("Name", "text"), required = false)
 
     <div class="control-group">
         <div class="controls">
@@ -11,3 +12,4 @@
         </div>
     </div>
 </form>
+<img src="/assets/images/ajax-loader.gif" class="imageFormUploading" />

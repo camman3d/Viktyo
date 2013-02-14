@@ -1,0 +1,15 @@
+@(url: String)
+
+<script src="@routes.Assets.at("javascripts/imageUpload.js")" type="text/javascript"></script>
+
+<form class="form-horizontal imageUpload" data-url="@url" data-purpose="profile">
+    @views.html.account.formHelpers.field(("Image", "file"), required = false)
+    <input type="hidden" name="name" value="Profile Picture" />
+
+    <div class="control-group">
+        <div class="controls">
+            <button type="submit" class="btn">Set as Profile Picture</button>
+        </div>
+    </div>
+</form>
+<img src="/assets/images/ajax-loader.gif" class="imageFormUploading" />

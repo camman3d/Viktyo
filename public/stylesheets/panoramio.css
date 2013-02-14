@@ -1,0 +1,20 @@
+.panoramioImage {
+    display: inline-block;
+    width: 33%;
+    float: left;
+}
+
+.panoramioImage > .well {
+    margin: 5px;
+}
+
+.panoramioImageHolder {
+    height: 200px;
+    text-align: center;
+}
+
+.panoramioImageHolder img {
+    width: auto;
+    height: 100%;
+    cursor: pointer;
+}

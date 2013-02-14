@@ -53,7 +53,12 @@ GET     /organization/:id                   controllers.Organizations.view(id: L
 # Postings
 GET     /posting                            controllers.Postings.browseList
 GET     /posting/map                        controllers.Postings.browseMap
+GET     /posting/create                     controllers.Postings.createPage
+POST    /posting/create                     controllers.Postings.create
 GET     /posting/:id                        controllers.Postings.view(id: Long)
+GET     /posting/:id/cover                  controllers.Postings.setCoverPage(id: Long)
+POST    /posting/:id/cover/panoramio        controllers.Postings.setPanoramio(id: Long)
+GET     /posting/:id/cover/:imageId         controllers.Postings.setCover(id: Long, imageId: Long)
 POST    /posting/:id/add/comment            controllers.Postings.addComment(id: Long)
 GET     /posting/:id/add/image/:imageId     controllers.Postings.addImage(id: Long, imageId: Long)
 GET     /posting/:postId/remove/:id         controllers.Postings.deleteActivityStream(postId: Long, id: Long)

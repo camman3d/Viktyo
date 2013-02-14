@@ -15,5 +15,8 @@
         @if(field._2 == "checkbox") {
             @views.html.account.formHelpers.checkbox(field._1, required, validator)
         }
+        @if(field._2 == "textarea") {
+            @views.html.account.formHelpers.textarea(field._1, required, validator)
+        }
     }
 }

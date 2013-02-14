@@ -5,6 +5,7 @@ function openSearch() {
         $("#searchForm").children("input[type='text']").focus();
         searchOpen = true;
     });
+    return false;
 }
 
 function closeSearch() {

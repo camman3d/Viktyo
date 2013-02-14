@@ -13,6 +13,15 @@
     </script>
 
     <div class="container">
+
+
+        @if(user.getProperty("accountType").get == "organization" || user.getProperty("accountType").get == "admin") {
+            <div class="pull-right">
+                <a href="@routes.Postings.createPage()" class="btn"><i class="icon-plus"></i> Create a new Listing</a>
+            </div>
+        }
+        <h1>Listings</h1>
+
         <div class="row">
             <div class="span3">
                 Sorting and filtering goes here

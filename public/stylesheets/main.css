@@ -352,3 +352,9 @@ a.btn-warning {
 .inlineBlock {
     display: inline-block;
 }
+
+/* Misc */
+
+.noOverflow {
+    overflow: hidden;
+}

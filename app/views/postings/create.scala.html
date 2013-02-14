@@ -1,0 +1,49 @@
+@(types: List[String], availableFields: List[(String, String)], requiredFields: List[String])(implicit request: RequestHeader, user: User)
+
+@main("createPosting", "VIKTYO - Create a Listing", Some(user)) {
+
+    <script type="text/javascript"
+    src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBSwVL1Smpqcwf2d_0hiecqQKu7XpFno_E&amp;sensor=true&amp;libraries=places">
+    </script>
+    <script src="@routes.Assets.at("javascripts/createPosting.js")" type="text/javascript"></script>
+
+    <div class="container">
+
+        <h1>Create a new Listing</h1>
+
+        <form class="form-horizontal validate" action="@routes.Postings.create()" method="@routes.Postings.create().method">
+            @views.html.account.formHelpers.field(("Name", "text"), required = true)
+            @views.html.account.formHelpers.field(("Location", "text"), required = true)
+            <input type="hidden" name="latitude" id="latitude" />
+            <input type="hidden" name="longitude" id="longitude" />
+
+            <div class="control-group">
+                <label class="control-label">Type *</label>
+                <div class="controls">
+                    @for(postingType <- types) {
+                        @defining(postingType.toLowerCase.replaceAll(" ", "_")) { typeValue =>
+                            <label class="radio">
+                                <input type="radio" name="postingType" value="@typeValue">
+                                @postingType
+                            </label>
+                        }
+                    }
+                    <span class="help-inline"></span>
+                </div>
+            </div>
+
+            @for(field <- availableFields) {
+                @views.html.account.formHelpers.field(field, requiredFields.contains(field._1))
+            }
+
+            <div class="control-group">
+                <div class="controls">
+                    <button type="submit" class="btn">Create Listing</button>
+                </div>
+            </div>
+        </form>
+
+
+    </div>
+
+}

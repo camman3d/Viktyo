@@ -7,6 +7,7 @@ import play.api.libs.json.{Json, JsArray}
 import anorm.NotAssigned
 import java.util.Date
 import tools.images.ImageUploader
+import tools.Panoramio
 
 object Postings extends Controller {
 
@@ -144,18 +145,59 @@ object Postings extends Controller {
           Ok(views.html.postings.view(updatedPosting, favorites, followers, images, comments))
   }
 
+  def createPage = Account.AuthenticatedAction {
+    implicit request =>
+      implicit user =>
+
+        // Make sure the user is an organization or admin
+        val accountType = user.getProperty("accountType").get
+        if (accountType == "organization" || accountType == "admin") {
+
+          val types = ViktyoConfiguration.findByName("postings.types").get.data.right.get
+          val availableFields = ViktyoConfiguration.findByName("postings.availableFields").get.data.right.get.zip(
+            ViktyoConfiguration.findByName("postings.availableFieldsTypes").get.data.right.get
+          )
+          val requiredFields = ViktyoConfiguration.findByName("postings.requiredFields").get.data.right.get
+
+          Ok(views.html.postings.create(types, availableFields, requiredFields))
+
+        } else
+          Redirect(routes.Postings.browseList()).flashing("alert" -> "You are not authorized to create listings.")
+
+  }
+
   def create = Account.AuthenticatedAction {
     implicit request =>
       implicit user =>
 
         // Make sure the user is an organization or admin
-        val accountType = user.getProperty("accountType")
+        val accountType = user.getProperty("accountType").get
         if (accountType == "organization" || accountType == "admin") {
           val posting = Posting.createFromRequest.save
           PostingActions.orgCreates(user, posting)
           Redirect(routes.Postings.view(posting.id.get)).flashing("success" -> "Listing created")
         } else
-          Redirect(routes.Application.index()).flashing("alert" -> "You are not authorized to create listings.")
+          Redirect(routes.Postings.browseList()).flashing("alert" -> "You are not authorized to create listings.")
+  }
+
+  def setCoverPage(id: Long) = AuthenticatedPostingAction(id) {
+    implicit request =>
+      implicit user =>
+        posting =>
+
+          // Make sure the user is an organization or admin
+          val accountType = user.getProperty("accountType").get
+          if (accountType == "organization" || accountType == "admin") {
+
+            // Make sure the organization owns the posting
+            if (posting.poster == user || accountType == "admin") {
+              val panoramios = Panoramio.getImages(posting.location.latitude, posting.location.longitude)
+              Ok(views.html.postings.setCover(posting, panoramios))
+
+            } else
+              Redirect(routes.Postings.view(id)).flashing("alert" -> "You are not authorized to edit this listing.")
+          } else
+            Redirect(routes.Postings.view(id)).flashing("alert" -> "You are not authorized to edit listings.")
   }
 
   def setPanoramio(id: Long) = AuthenticatedPostingAction(id) {
@@ -164,13 +206,13 @@ object Postings extends Controller {
         posting =>
 
       // Make sure the user is an organization or admin
-        val accountType = user.getProperty("accountType")
+        val accountType = user.getProperty("accountType").get
         if (accountType == "organization" || accountType == "admin") {
 
           // Make sure the organization owns the posting
-          if (posting.poster == user) {
+          if (posting.poster == user || accountType == "admin") {
             val panoramio = request.body.asFormUrlEncoded.get("panoramio")(0)
-            posting.setProperty("panoramio", panoramio)
+            posting.setProperty("panoramio", panoramio).save
             val uri = (Json.parse(panoramio) \ "photo_file_url").as[String]
             val image = Image(NotAssigned, posting.name, uri).setProperty("owner", user.id.get.toString)
               .setProperty("added", new Date().getTime.toString).save
@@ -193,11 +235,11 @@ object Postings extends Controller {
           if (accountType == "organization" || accountType == "admin") {
 
             // Make sure the organization owns the posting
-            if (posting.poster == user) {
+            if (posting.poster == user || accountType == "admin") {
 
-              // Get the image and make sure you own it
+              // Get the image and make sure you own it or admin
               val image = Image.findById(imageId)
-              if (image.isDefined && image.get.getProperty("owner").get == user.id.get.toString) {
+              if (image.isDefined && (image.get.getProperty("owner").get == user.id.get.toString || accountType == "admin")) {
                 PostingActions.orgUpdatesCover(user, posting, image.get)
                 Redirect(routes.Postings.view(posting.id.get)).flashing("info" -> "Listing cover image updated")
               } else

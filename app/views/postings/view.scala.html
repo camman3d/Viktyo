@@ -9,6 +9,19 @@
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/posting.css")">
 
     <div class="container separator">
+
+        @if(user == posting.poster || user.getProperty("accountType").get == "admin") {
+            <div class="row">
+                <div class="span9 offset3">
+                    <div class="btn-group">
+                        <a class="btn" href="@routes.Postings.setCoverPage(posting.id.get)"><i class="icon-picture"></i> Change Picture</a>
+                        <a class="btn" href="#"><i class="icon-pencil"></i> Edit</a>
+                        <a class="btn" href="#"><i class="icon-trash"></i> Delete</a>
+                    </div>
+                </div>
+            </div>
+        }
+
         <div class="row">
             <div class="span3">
                 Organization information
@@ -108,17 +121,7 @@
         </div>
         <div class="modal-body">
             <h3 id="imageModalLabel">Add an image</h3>
-
-            <form class="form-horizontal validate" action="@routes.Postings.addImage(posting.id.get)" method="@routes.Postings.addImage(posting.id.get).method" enctype="multipart/form-data">
-                @views.html.account.formHelpers.field(("Image", "file"), required = true)
-                @views.html.account.formHelpers.field(("Name", "text"), required = true)
-
-                <div class="control-group">
-                    <div class="controls">
-                        <button type="submit" class="btn">Go!</button>
-                    </div>
-                </div>
-            </form>
+            @views.html.images.imageUpload("/posting/" + posting.id.get + "/add/image/")
 
         </div>
         <div class="modal-footer">

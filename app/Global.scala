@@ -37,6 +37,12 @@ object Global extends GlobalSettings {
       ViktyoConfiguration(NotAssigned, "postings.colors.study_abroad", Left("green")).save
     if(!ViktyoConfiguration.findByName("postings.colors.volunteer").isDefined)
       ViktyoConfiguration(NotAssigned, "postings.colors.volunteer", Left("purple")).save
+    if(!ViktyoConfiguration.findByName("postings.availableFields").isDefined)
+      ViktyoConfiguration(NotAssigned, "postings.availableFields", Right(List("Description"))).save
+    if(!ViktyoConfiguration.findByName("postings.availableFieldsTypes").isDefined)
+      ViktyoConfiguration(NotAssigned, "postings.availableFieldsTypes", Right(List("textarea"))).save
+    if(!ViktyoConfiguration.findByName("postings.requiredFields").isDefined)
+      ViktyoConfiguration(NotAssigned, "postings.requiredFields", Right(List("Description"))).save
 
     // Test data
     if(!ViktyoConfiguration.findByName("testdata.created").isDefined) {

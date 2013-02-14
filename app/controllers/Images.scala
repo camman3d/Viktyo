@@ -5,6 +5,7 @@ import tools.images.ImageUploader
 import play.api.libs.json.Json
 import concurrent.ExecutionContext
 import ExecutionContext.Implicits.global
+import play.api.Logger
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,6 +19,9 @@ object Images extends Controller {
   def upload = Account.AuthenticatedAction {
     request =>
       implicit user =>
+
+        Logger.info("Got image upload")
+
         // Handle the image upload
         val file = request.body.asMultipartFormData.get.file("image").get
         val name = request.body.asMultipartFormData.get.dataParts("name")(0)
