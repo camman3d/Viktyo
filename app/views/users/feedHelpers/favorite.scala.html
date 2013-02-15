@@ -1,3 +1,5 @@
 @(user: User, posting: Posting)
 
+<i class="icon-star icon-2x pad-left-low pad-right-low orange"></i>
+
 <a href="@routes.Users.view(user.id.get)">@user.fullname</a> favorited the listing <a href="@routes.Postings.view(posting.id.get)">@posting.name</a>.

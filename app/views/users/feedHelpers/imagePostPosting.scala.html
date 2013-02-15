@@ -1,4 +1,6 @@
 @(user: User, image: Image, posting: Posting)
 
+<i class="icon-picture icon-2x pad-left-low pad-right-low orange"></i>
+
 <!-- TODO: Add link to image -->
-    <a href="@routes.Users.view(user.id.get)">@user.fullname</a> added an <a href="#">image</a> to the listing <a href="@routes.Postings.view(posting.id.get)">@posting.name</a>.
+<a href="@routes.Users.view(user.id.get)">@user.fullname</a> added an <a href="#">image</a> to the listing <a href="@routes.Postings.view(posting.id.get)">@posting.name</a>.

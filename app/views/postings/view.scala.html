@@ -53,14 +53,14 @@
                     </div>
                     <div class="pull-right pad-top-med">
                         @if(favorites.contains(user)) {
-                            <a class="pad-right-low iconLight-75" href="@routes.Postings.unfavorite(posting.id.get)"><img src="/assets/images/icons/glyphicons_049_star.png" alt="Unfavorite this"></a>
+                            <a class="pad-right-low" href="@routes.Postings.unfavorite(posting.id.get)"><i class="icon-star icon-2x orange"></i></a>
                         } else {
-                            <a class="pad-right-low iconLight-25" href="@routes.Postings.favorite(posting.id.get)"><img src="/assets/images/icons/glyphicons_049_star.png" alt="Favorite this"></a>
+                            <a class="pad-right-low iconLight-25" href="@routes.Postings.favorite(posting.id.get)"><i class="icon-star icon-2x orange"></i></a>
                         }
                         @if(followers.contains(user)) {
-                            <a class="iconLight-75" href="@routes.Postings.unfollow(posting.id.get)"><img src="/assets/images/icons/glyphicons_006_user_add.png" alt="Unfollow this"></a>
+                            <a class="iconLight-75" href="@routes.Postings.unfollow(posting.id.get)"><i class="icon-thumbs-up icon-2x green"></i></a>
                         } else {
-                            <a class="iconLight-25" href="@routes.Postings.follow(posting.id.get)"><img src="/assets/images/icons/glyphicons_006_user_add.png" alt="Follow this"></a>
+                            <a class="iconLight-25" href="@routes.Postings.follow(posting.id.get)"><i class="icon-thumbs-up icon-2x green"></i></a>
                         }
                     </div>
                 </div>

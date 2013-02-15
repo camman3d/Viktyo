@@ -1,6 +1,9 @@
 @(user: User, posting: Posting, comment: Text)
 
-<a href="@routes.Users.view(user.id.get)">@user.fullname</a> commented on the listing <a href="@routes.Postings.view(posting.id.get)">@posting.name</a>.
+<!-- Action image -->
+<i class="icon-comment icon-2x pad-left-low pad-right-low blue"></i>
+
+<a href="@routes.Users.view(user.id.get)" class="blue">@user.fullname</a> commented on the listing <a href="@routes.Postings.view(posting.id.get)" class="blue">@posting.name</a>.
 <div class="feedEntryComment">
     @comment.textValue
 </div>

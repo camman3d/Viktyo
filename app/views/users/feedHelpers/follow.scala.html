@@ -1,3 +1,5 @@
 @(user: User, otherUser: User)
 
-<a href="@routes.Users.view(user.id.get)">@user.fullname</a> is now following <a href="@routes.Users.view(otherUser.id.get)">@otherUser.fullname</a>.
+<i class="icon-user icon-2x pad-left-low pad-right-low green"></i>
+
+<a href="@routes.Users.view(user.id.get)" class="green">@user.fullname</a> is now following <a href="@routes.Users.view(otherUser.id.get)" class="green">@otherUser.fullname</a>.

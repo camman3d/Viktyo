@@ -124,11 +124,26 @@ hr.dark {
 }
 
 /* Text Color Classes */
+.darkNeutral {
+    color: #333333;
+}
+.mediumNeutral {
+    color: #666666;
+}
+.neutral {
+    color: #cccccc;
+}
+.lightNeutral {
+    color: #f3f3f3;
+}
 .orange {
     color: #EE9D2F;
 }
 .blue {
-    color: #3165b0;
+    color: #3564B0;
+}
+.green {
+    color: #65B846;
 }
 
 
